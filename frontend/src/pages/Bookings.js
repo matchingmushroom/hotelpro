@@ -598,6 +598,45 @@ const [rooms, setRooms] = useState([]);
                   </label>
                 )}
               </div>
+
+              <div style={{ marginTop: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <label style={{ fontWeight: 600, fontSize: '0.85rem' }}>
+                    <i className="fas fa-users" style={{marginRight:6}} />Other Guests Staying
+                  </label>
+                  <button type="button" className="btn btn-sm btn-outline" onClick={() => setCompanions(prev => [...prev, { name: '', phone: '', address: '' }])}>
+                    <i className="fas fa-plus" /> Add Guest
+                  </button>
+                </div>
+                {companions.length === 0 && (
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', padding: '8px 0' }}>
+                    Add details of other guests sharing this room (optional)
+                  </div>
+                )}
+                {companions.map((c, i) => (
+                  <div key={i} style={{ padding: '12px', border: '1px solid var(--border)', borderRadius: 'var(--radius)', marginBottom: 8 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <span style={{ fontWeight: 600, fontSize: '0.82rem', color: 'var(--text-muted)' }}>Guest #{i + 2}</span>
+                        {c.name && <span className="btn btn-sm btn-outline" style={{fontSize:'0.72rem',padding:'2px 8px'}} onClick={() => setCompanions(prev => prev.map((x, j) => j === i ? { name: '', phone: '', address: '' } : x))}>Clear</span>}
+                      </div>
+                      <div className="form-row" style={{gap:8}}>
+                        <div className="form-group" style={{flex:2}}>
+                          <input className="form-control" placeholder="Full Name" value={c.name}
+                            onChange={e => setCompanions(prev => prev.map((x, j) => j === i ? {...x, name: e.target.value} : x))} />
+                        </div>
+                        <div className="form-group" style={{flex:1}}>
+                          <input className="form-control" placeholder="Mobile" value={c.phone}
+                            onChange={e => setCompanions(prev => prev.map((x, j) => j === i ? {...x, phone: e.target.value} : x))} />
+                        </div>
+                      </div>
+                      <div className="form-group" style={{marginTop:4}}>
+                        <input className="form-control" placeholder="Address (optional)" value={c.address}
+                          onChange={e => setCompanions(prev => prev.map((x, j) => j === i ? {...x, address: e.target.value} : x))} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="cin-modal-footer">
               <button className="btn btn-outline" onClick={() => setCheckinModal(null)}>Cancel</button>
@@ -640,37 +679,7 @@ const [rooms, setRooms] = useState([]);
                         <div className="group-room-left">
                           <strong>{room?.room_number || b.room_id?.slice(0, 8)}</strong>
                           <span className="text-muted">{room?.room_type || '-'}</span>
-              </div>
-
-              {companions.length > 0 && (
-                <div style={{ marginTop: 16 }}>
-                  <label style={{ fontWeight: 600, fontSize: '0.85rem', display: 'block', marginBottom: 8 }}>
-                    <i className="fas fa-users" style={{marginRight:6}} />Other Guests Staying
-                  </label>
-                  {companions.map((c, i) => (
-                    <div key={i} style={{ padding: '12px', border: '1px solid var(--border)', borderRadius: 'var(--radius)', marginBottom: 8 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                        <span style={{ fontWeight: 600, fontSize: '0.82rem', color: 'var(--text-muted)' }}>Guest #{i + 2}</span>
-                        {c.name && <span className="btn btn-sm btn-outline" style={{fontSize:'0.72rem',padding:'2px 8px'}} onClick={() => setCompanions(prev => prev.map((x, j) => j === i ? { name: '', phone: '', address: '' } : x))}>Clear</span>}
-                      </div>
-                      <div className="form-row" style={{gap:8}}>
-                        <div className="form-group" style={{flex:2}}>
-                          <input className="form-control" placeholder="Full Name" value={c.name}
-                            onChange={e => setCompanions(prev => prev.map((x, j) => j === i ? {...x, name: e.target.value} : x))} />
                         </div>
-                        <div className="form-group" style={{flex:1}}>
-                          <input className="form-control" placeholder="Mobile" value={c.phone}
-                            onChange={e => setCompanions(prev => prev.map((x, j) => j === i ? {...x, phone: e.target.value} : x))} />
-                        </div>
-                      </div>
-                      <div className="form-group" style={{marginTop:4}}>
-                        <input className="form-control" placeholder="Address (optional)" value={c.address}
-                          onChange={e => setCompanions(prev => prev.map((x, j) => j === i ? {...x, address: e.target.value} : x))} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
                         <StatusBadge status={b.status} />
                       </div>
                     );
