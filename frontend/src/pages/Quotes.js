@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fetchAll, insertRecord, updateRecord, removeRecord } from '../services/supabaseService';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import StatusBadge from '../components/common/StatusBadge';
@@ -8,6 +9,7 @@ import PrintPreview from '../components/finance/PrintPreview';
 import { sendEmail } from '../services/backendService';
 
 export default function Quotes() {
+  const navigate = useNavigate();
   const [quotes, setQuotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -181,7 +183,7 @@ export default function Quotes() {
                     )}
                     {q.status !== 'converted' && (
                       <button className="btn btn-accent btn-sm"
-                        onClick={() => window.location.href = `/invoices?convert=${q.id}`} title="Convert to Invoice">
+                        onClick={() => navigate(`/invoices?convert=${q.id}`)} title="Convert to Invoice">
                         <i className="fas fa-file-invoice"></i>
                       </button>
                     )}

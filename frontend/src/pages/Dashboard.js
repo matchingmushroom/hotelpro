@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { fetchAll, countRecords } from '../services/supabaseService';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { profile } = useAuth();
   const [stats, setStats] = useState({
     totalRooms: 0, availableRooms: 0, todayCheckIns: 0, todayCheckOuts: 0,
@@ -64,13 +66,13 @@ export default function Dashboard() {
         <div className="card">
           <h3>Quick Actions</h3>
           <div className="quick-actions">
-            <button className="btn btn-primary" onClick={() => window.location.href = '/bookings/new'}>
+            <button className="btn btn-primary" onClick={() => navigate('/bookings/new')}>
               <i className="fas fa-plus"></i> New Booking
             </button>
-            <button className="btn btn-outline" onClick={() => window.location.href = '/check-in-out'}>
+            <button className="btn btn-outline" onClick={() => navigate('/check-in-out')}>
               <i className="fas fa-sign-in-alt"></i> Check-In
             </button>
-            <button className="btn btn-outline" onClick={() => window.location.href = '/food/orders'}>
+            <button className="btn btn-outline" onClick={() => navigate('/food/orders')}>
               <i className="fas fa-utensils"></i> Food Orders
             </button>
           </div>

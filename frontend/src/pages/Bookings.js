@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fetchAll, removeRecord } from '../services/supabaseService';
 import { formatDate, formatCurrency } from '../utils/formatters';
 import StatusBadge from '../components/common/StatusBadge';
 import { showConfirm, showSuccess, showError } from '../components/common/ConfirmDialog';
 
 export default function Bookings() {
+  const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -63,13 +65,13 @@ export default function Bookings() {
           <p>{bookings.length} total &middot; {bookings.filter(b => b.status === 'confirmed').length} upcoming</p>
         </div>
         <div className="flex gap-1">
-          <button className="btn btn-primary" onClick={() => window.location.href = '/bookings/new'}>
+          <button className="btn btn-primary" onClick={() => navigate('/bookings/new')}>
             <i className="fas fa-plus"></i> New Booking
           </button>
-          <button className="btn btn-outline" onClick={() => window.location.href = '/bookings/group'}>
+          <button className="btn btn-outline" onClick={() => navigate('/bookings/group')}>
             <i className="fas fa-users"></i> Group
           </button>
-          <button className="btn btn-outline" onClick={() => window.location.href = '/bookings/walk-in'}>
+          <button className="btn btn-outline" onClick={() => navigate('/bookings/walk-in')}>
             <i className="fas fa-walking"></i> Walk-In
           </button>
         </div>
@@ -126,7 +128,7 @@ export default function Bookings() {
                       )}
                       {b.status === 'confirmed' && (
                         <button className="btn-icon" title="Check In"
-                          onClick={() => window.location.href = `/check-in-out?booking=${b.id}`}>
+                          onClick={() => navigate(`/check-in-out?booking=${b.id}`)}>
                           <i className="fas fa-sign-in-alt"></i>
                         </button>
                       )}
