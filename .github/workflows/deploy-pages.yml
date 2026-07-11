@@ -28,6 +28,11 @@ jobs:
       - name: Build
         working-directory: frontend
         run: npm run build
+        env:
+          REACT_APP_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          REACT_APP_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          REACT_APP_GAS_URL: ${{ secrets.GAS_URL }}
+          REACT_APP_BACKEND_URL: ${{ secrets.BACKEND_URL || 'http://localhost:5000' }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
