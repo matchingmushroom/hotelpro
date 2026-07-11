@@ -4,6 +4,8 @@ import { fetchAll, insertRecord, updateRecord, removeRecord } from '../services/
 import { formatCurrency, formatDate } from '../utils/formatters';
 import StatusBadge from '../components/common/StatusBadge';
 import { showConfirm, showSuccess, showError, showToast } from '../components/common/ConfirmDialog';
+import DetailModal from '../components/common/DetailModal';
+import ViewToggle from '../components/common/ViewToggle';
 import LineItemForm from '../components/finance/LineItemForm';
 import PrintPreview from '../components/finance/PrintPreview';
 import { sendEmail } from '../services/backendService';
@@ -21,6 +23,8 @@ export default function Quotes() {
     valid_until: '', notes: '',
   });
   const [statusFilter, setStatusFilter] = useState('');
+  const [selectedQuote, setSelectedQuote] = useState(null);
+  const [viewMode, setViewMode] = useState('table');
 
   useEffect(() => {
     loadQuotes();
@@ -136,78 +140,141 @@ export default function Quotes() {
         <button className="btn btn-primary" onClick={openNew}><i className="fas fa-plus"></i> New Quote</button>
       </div>
 
-      <div className="card mb-2" style={{ maxWidth: 200 }}>
-        <select className="form-control" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-          <option value="">All Quotes</option>
-          <option value="draft">Draft</option>
-          <option value="sent">Sent</option>
-          <option value="accepted">Accepted</option>
-          <option value="rejected">Rejected</option>
-          <option value="expired">Expired</option>
-          <option value="converted">Converted</option>
-        </select>
+      <div className="toolbar-row">
+        <div className="card" style={{ maxWidth: 200 }}>
+          <select className="form-control" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+            <option value="">All Quotes</option>
+            <option value="draft">Draft</option>
+            <option value="sent">Sent</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+            <option value="expired">Expired</option>
+            <option value="converted">Converted</option>
+          </select>
+        </div>
+        <ViewToggle view={viewMode} onChange={setViewMode} />
       </div>
 
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Guest</th>
-              <th>Email</th>
-              <th>Total</th>
-              <th>Valid Until</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map(q => (
-              <tr key={q.id}>
-                <td><strong>{q.guest_name}</strong></td>
-                <td className="text-muted">{q.guest_email || '-'}</td>
-                <td><strong>{formatCurrency(q.total || q.subtotal * 1.1)}</strong></td>
-                <td>{q.valid_until ? formatDate(q.valid_until) : '-'}</td>
-                <td><StatusBadge status={q.status} /></td>
-                <td>
-                  <div className="flex gap-1">
-                    <button className="btn btn-outline btn-sm" onClick={() => setPreviewQuote(q)} title="Preview">
-                      <i className="fas fa-eye"></i>
-                    </button>
-                    <button className="btn btn-outline btn-sm" onClick={() => openEdit(q)} title="Edit">
-                      <i className="fas fa-edit"></i>
-                    </button>
-                    {q.status === 'draft' && q.guest_email && (
-                      <button className="btn btn-primary btn-sm" onClick={() => handleSend(q)} title="Send">
-                        <i className="fas fa-paper-plane"></i>
-                      </button>
-                    )}
-                    {q.status !== 'converted' && (
-                      <button className="btn btn-accent btn-sm"
-                        onClick={() => navigate(`/invoices?convert=${q.id}`)} title="Convert to Invoice">
-                        <i className="fas fa-file-invoice"></i>
-                      </button>
-                    )}
-                    <select className="status-select" value={q.status}
-                      onChange={e => handleStatusChange(q, e.target.value)}>
-                      <option value="draft">Draft</option>
-                      <option value="sent">Sent</option>
-                      <option value="accepted">Accepted</option>
-                      <option value="rejected">Rejected</option>
-                      <option value="expired">Expired</option>
-                    </select>
-                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(q)} title="Delete">
-                      <i className="fas fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
+      {viewMode === 'table' ? (
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Guest</th>
+                <th>Email</th>
+                <th>Total</th>
+                <th>Valid Until</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-            {filtered.length === 0 && (
-              <tr><td colSpan="6" className="text-center text-muted py-3">No quotes found.</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {filtered.map(q => (
+                <tr key={q.id} className="clickable-row" onClick={() => setSelectedQuote(q)}>
+                  <td><strong>{q.guest_name}</strong></td>
+                  <td className="text-muted">{q.guest_email || '-'}</td>
+                  <td><strong>{formatCurrency(q.total || q.subtotal * 1.1)}</strong></td>
+                  <td>{q.valid_until ? formatDate(q.valid_until) : '-'}</td>
+                  <td><StatusBadge status={q.status} /></td>
+                  <td>
+                    <div className="flex gap-1">
+                      <button className="btn btn-outline btn-sm" onClick={e => { e.stopPropagation(); setPreviewQuote(q); }} title="Preview">
+                        <i className="fas fa-eye"></i>
+                      </button>
+                      <button className="btn btn-outline btn-sm" onClick={e => { e.stopPropagation(); openEdit(q); }} title="Edit">
+                        <i className="fas fa-edit"></i>
+                      </button>
+                      {q.status === 'draft' && q.guest_email && (
+                        <button className="btn btn-primary btn-sm" onClick={e => { e.stopPropagation(); handleSend(q); }} title="Send">
+                          <i className="fas fa-paper-plane"></i>
+                        </button>
+                      )}
+                      {q.status !== 'converted' && (
+                        <button className="btn btn-accent btn-sm"
+                          onClick={e => { e.stopPropagation(); navigate(`/invoices?convert=${q.id}`); }} title="Convert to Invoice">
+                          <i className="fas fa-file-invoice"></i>
+                        </button>
+                      )}
+                      <select className="status-select" value={q.status}
+                        onChange={e => handleStatusChange(q, e.target.value)}>
+                        <option value="draft">Draft</option>
+                        <option value="sent">Sent</option>
+                        <option value="accepted">Accepted</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="expired">Expired</option>
+                      </select>
+                      <button className="btn btn-danger btn-sm" onClick={e => { e.stopPropagation(); handleDelete(q); }} title="Delete">
+                        <i className="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr><td colSpan="6" className="text-center text-muted py-3">No quotes found.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="card-grid">
+          {filtered.map(q => (
+            <div key={q.id} className="card-grid-item">
+              <div className="card-grid-head" onClick={() => setSelectedQuote(q)}>
+                <strong className="text-truncate">{q.guest_name}</strong>
+                <span className="text-muted text-truncate">{q.guest_email || '-'}</span>
+              </div>
+              <div className="card-grid-body">
+                <div className="card-field text-truncate">
+                  <span className="card-label">Total</span>
+                  <strong>{formatCurrency(q.total || q.subtotal * 1.1)}</strong>
+                </div>
+                <div className="card-field text-truncate">
+                  <span className="card-label">Valid Until</span>
+                  <span>{q.valid_until ? formatDate(q.valid_until) : '-'}</span>
+                </div>
+                <div className="card-field text-truncate">
+                  <span className="card-label">Status</span>
+                  <StatusBadge status={q.status} />
+                </div>
+              </div>
+              <div className="card-grid-actions">
+                <button className="btn btn-outline btn-sm" onClick={() => setPreviewQuote(q)} title="Preview">
+                  <i className="fas fa-eye"></i>
+                </button>
+                <button className="btn btn-outline btn-sm" onClick={e => { e.stopPropagation(); openEdit(q); }} title="Edit">
+                  <i className="fas fa-edit"></i>
+                </button>
+                {q.status === 'draft' && q.guest_email && (
+                  <button className="btn btn-primary btn-sm" onClick={e => { e.stopPropagation(); handleSend(q); }} title="Send">
+                    <i className="fas fa-paper-plane"></i>
+                  </button>
+                )}
+                {q.status !== 'converted' && (
+                  <button className="btn btn-accent btn-sm"
+                    onClick={e => { e.stopPropagation(); navigate(`/invoices?convert=${q.id}`); }} title="Convert to Invoice">
+                    <i className="fas fa-file-invoice"></i>
+                  </button>
+                )}
+                <select className="status-select" value={q.status}
+                  onChange={e => handleStatusChange(q, e.target.value)}>
+                  <option value="draft">Draft</option>
+                  <option value="sent">Sent</option>
+                  <option value="accepted">Accepted</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="expired">Expired</option>
+                </select>
+                <button className="btn btn-danger btn-sm" onClick={e => { e.stopPropagation(); handleDelete(q); }} title="Delete">
+                  <i className="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          ))}
+          {filtered.length === 0 && (
+            <div className="text-center text-muted py-3" style={{ gridColumn: '1 / -1' }}>No quotes found.</div>
+          )}
+        </div>
+      )}
 
       {showForm && (
         <div className="modal-overlay" onClick={() => setShowForm(false)}>
@@ -264,6 +331,21 @@ export default function Quotes() {
         </div>
       )}
 
+      {selectedQuote && (
+        <DetailModal item={selectedQuote} title="Quote Details"
+          fields={[
+            { key: 'guest_name', label: 'Guest' },
+            { key: 'guest_email', label: 'Email' },
+            { key: 'guest_phone', label: 'Phone' },
+            { key: 'total', label: 'Total', render: v => formatCurrency(v) },
+            { key: 'valid_until', label: 'Valid Until', render: v => formatDate(v) },
+            { key: 'status', label: 'Status', render: v => <StatusBadge status={v} /> },
+            { key: 'notes', label: 'Notes', hide: v => !v },
+            { key: 'created_at', label: 'Created', render: v => formatDate(v) },
+          ]}
+          onClose={() => setSelectedQuote(null)} />
+      )}
+
       {previewQuote && (
         <PrintPreview
           title="Quote"
@@ -281,12 +363,31 @@ export default function Quotes() {
         .modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); }
         .modal-body { padding: 24px; }
         .modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 16px 24px; border-top: 1px solid var(--border); }
+        .toolbar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .clickable-row { cursor: pointer; transition: background 0.15s; }
+        .clickable-row:hover { background: var(--bg-alt); }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+        .card-grid-item { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s; }
+        .card-grid-item:hover { box-shadow: var(--shadow-md); }
+        .card-grid-head { padding: 14px 16px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; border-bottom: 1px solid var(--border-light); }
+        .card-grid-head strong { font-size: 0.95rem; }
+        .card-grid-head span { font-size: 0.8rem; }
+        .card-grid-body { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+        .card-field { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; }
+        .card-label { color: var(--text-muted); }
+        .card-grid-actions { display: flex; align-items: center; gap: 6px; padding: 10px 16px; border-top: 1px solid var(--border-light); flex-wrap: wrap; }
         .status-select { padding: 4px 8px; border-radius: 100px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; cursor: pointer; outline: none; background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); -webkit-appearance: none; }
         .btn-accent { background: var(--accent); color: var(--white); border: none; }
         .btn-accent:hover { background: var(--accent-hover); }
         .btn-danger { background: var(--error); color: var(--white); border: none; }
         .btn-danger:hover { opacity: 0.9; }
         .py-3 { padding-top: 24px; padding-bottom: 24px; }
+        .text-truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 100%; }
+        .text-wrap { white-space: normal; word-break: break-word; overflow-wrap: break-word; }
+        .card-grid-item { overflow: hidden; }
+        .card-grid-body { min-width: 0; }
+        .card-grid-head strong, .card-grid-head span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+        .card-grid-actions { overflow: hidden; }
       `}</style>
     </div>
   );

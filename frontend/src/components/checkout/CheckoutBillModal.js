@@ -25,6 +25,7 @@ export default function CheckoutBillModal({ booking, guestName, roomNumber, onCl
   const [manualItems, setManualItems] = useState([]);
   const [paymentMethods, setPaymentMethods] = useState([]);
   const [paymentMethodId, setPaymentMethodId] = useState('');
+  const [paymentType, setPaymentType] = useState('full');
   const [amountPaid, setAmountPaid] = useState('');
   const [paymentNote, setPaymentNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -45,8 +46,9 @@ export default function CheckoutBillModal({ booking, guestName, roomNumber, onCl
   }, []);
 
   useEffect(() => {
-    if (grandTotal > 0) setAmountPaid(grandTotal.toFixed(2));
-  }, [grandTotal]);
+    if (paymentType === 'full' && grandTotal > 0) setAmountPaid(grandTotal.toFixed(2));
+    if (paymentType === 'credit') setAmountPaid('0');
+  }, [grandTotal, paymentType]);
 
   async function loadData() {
     try {
@@ -161,6 +163,8 @@ export default function CheckoutBillModal({ booking, guestName, roomNumber, onCl
       });
 
       // Create invoice
+      const paidAmount = parseFloat(amountPaid) || 0;
+      const invoiceStatus = paidAmount >= grandTotal ? 'paid' : paidAmount > 0 ? 'partial' : 'unpaid';
       const invoice = await insertRecord('invoices', {
         booking_id: booking.id,
         guest_id: booking.guest_id || null,
@@ -170,18 +174,18 @@ export default function CheckoutBillModal({ booking, guestName, roomNumber, onCl
         subtotal: parseFloat(subtotal.toFixed(2)),
         tax: parseFloat(tax.toFixed(2)),
         total: parseFloat(grandTotal.toFixed(2)),
-        amount_paid: parseFloat(amountPaid) || 0,
-        balance: parseFloat((grandTotal - (parseFloat(amountPaid) || 0)).toFixed(2)),
-        status: (parseFloat(amountPaid) || 0) >= grandTotal ? 'paid' : (parseFloat(amountPaid) || 0) > 0 ? 'partial' : 'draft',
-        due_date: new Date().toISOString().split('T')[0],
+        amount_paid: paidAmount,
+        balance: parseFloat((grandTotal - paidAmount).toFixed(2)),
+        status: invoiceStatus,
+        due_date: paymentType === 'credit' || paymentType === 'partial' ? new Date(Date.now() + 7*86400000).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         notes: paymentNote || null,
       });
 
       // Record payment
-      if (parseFloat(amountPaid) > 0 && paymentMethodId) {
+      if (paidAmount > 0 && paymentMethodId) {
         await insertRecord('payments', {
           invoice_id: invoice.id,
-          amount: parseFloat(amountPaid),
+          amount: paidAmount,
           payment_method_id: paymentMethodId,
           notes: paymentNote || null,
           status: 'completed',
@@ -214,7 +218,7 @@ export default function CheckoutBillModal({ booking, guestName, roomNumber, onCl
         }
       }
 
-      onComplete?.(`${guestName(booking)} checked out. ${formatCurrency(grandTotal)} bill settled.${pointsMsg}`);
+      onComplete?.(`${guestName(booking)} checked out.${paidAmount > 0 ? ` ${formatCurrency(paidAmount)} collected.` : ' Bill on credit.'}${pointsMsg}`);
     } catch (err) {
       throw err;
     } finally {
@@ -341,24 +345,52 @@ export default function CheckoutBillModal({ booking, guestName, roomNumber, onCl
             {/* Payment */}
             <div className="co-payment-section">
               <h3><i className="fas fa-credit-card"></i> Payment</h3>
-              <div className="co-payment-row">
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Method</label>
-                  <select className="form-control" value={paymentMethodId}
-                    onChange={e => setPaymentMethodId(e.target.value)}>
-                    {paymentMethods.length === 0 && <option value="">No methods configured</option>}
-                    {paymentMethods.map(pm => (
-                      <option key={pm.id} value={pm.id}>{pm.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group" style={{ flex: 1 }}>
-                  <label>Amount Paid</label>
-                  <input className="form-control" type="number" value={amountPaid}
-                    onChange={e => setAmountPaid(e.target.value)}
-                    min={0} step="0.01" />
-                </div>
+
+              <div className="co-payment-types">
+                <button type="button" className={`co-pt-btn ${paymentType === 'full' ? 'active' : ''}`}
+                  onClick={() => setPaymentType('full')}>
+                  <i className="fas fa-check-circle" /> Full Payment
+                </button>
+                <button type="button" className={`co-pt-btn ${paymentType === 'partial' ? 'active' : ''}`}
+                  onClick={() => setPaymentType('partial')}>
+                  <i className="fas fa-adjust" /> Partial
+                </button>
+                <button type="button" className={`co-pt-btn ${paymentType === 'credit' ? 'active' : ''}`}
+                  onClick={() => setPaymentType('credit')}>
+                  <i className="fas fa-file-invoice" /> Full Credit
+                </button>
               </div>
+
+              {paymentType !== 'credit' && (
+                <div className="co-payment-row">
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label>Method</label>
+                    <select className="form-control" value={paymentMethodId}
+                      onChange={e => setPaymentMethodId(e.target.value)}>
+                      {paymentMethods.length === 0 && <option value="">No methods configured</option>}
+                      {paymentMethods.map(pm => (
+                        <option key={pm.id} value={pm.id}>{pm.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label>Amount Paid</label>
+                    <input className="form-control" type="number" value={amountPaid}
+                      onChange={e => setAmountPaid(e.target.value)}
+                      min={0} step="0.01" disabled={paymentType === 'credit'} />
+                    {paymentType === 'partial' && (
+                      <div style={{fontSize:'0.72rem',color:'var(--text-muted)',marginTop:2}}>
+                        Balance: {formatCurrency(grandTotal - (parseFloat(amountPaid) || 0))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              {paymentType === 'credit' && (
+                <div className="co-credit-note">
+                  <i className="fas fa-info-circle"></i> No payment collected. Invoice marked as unpaid/{'credit'}.
+                </div>
+              )}
               <div className="form-group">
                 <label>Note (optional)</label>
                 <input className="form-control" value={paymentNote}
@@ -379,7 +411,7 @@ export default function CheckoutBillModal({ booking, guestName, roomNumber, onCl
             }
           }} disabled={submitting || loading}>
             {submitting ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-sign-out-alt"></i>}
-            {submitting ? 'Processing...' : `Check Out & Settle Bill (${formatCurrency(grandTotal)})`}
+            {submitting ? 'Processing...' : paymentType === 'credit' ? 'Check Out (Credit)' : `Check Out & Collect ${formatCurrency(parseFloat(amountPaid) || 0)}`}
           </button>
         </div>
       </div>
@@ -492,6 +524,29 @@ export default function CheckoutBillModal({ booking, guestName, roomNumber, onCl
 
         .co-payment-section { margin-bottom: 8px; }
         .co-payment-row { display: flex; gap: 16px; }
+
+        .co-payment-types {
+          display: flex; gap: 6px; margin-bottom: 12px;
+        }
+        .co-pt-btn {
+          flex: 1; padding: 10px 8px; border: 2px solid var(--border);
+          border-radius: var(--radius); background: var(--bg-card);
+          cursor: pointer; text-align: center; font-size: 0.78rem;
+          font-weight: 500; color: var(--text-muted);
+          transition: all 0.2s; display: flex; align-items: center;
+          justify-content: center; gap: 5px;
+        }
+        .co-pt-btn:hover { border-color: var(--primary-light); color: var(--text-secondary); }
+        .co-pt-btn.active {
+          border-color: var(--primary); color: var(--primary); background: #eef2ff;
+        }
+        .co-pt-btn i { font-size: 0.85rem; }
+        .co-credit-note {
+          padding: 12px; border-radius: var(--radius);
+          background: #fffbeb; color: #92400e;
+          font-size: 0.82rem; display: flex; align-items: center; gap: 8px;
+          margin-bottom: 12px;
+        }
 
         @media (max-width: 768px) {
           .co-modal { margin: 10px; border-radius: var(--radius-lg); }

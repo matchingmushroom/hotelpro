@@ -3,6 +3,8 @@ import { fetchAll, insertRecord, updateRecord, removeRecord } from '../services/
 import { formatDate } from '../utils/formatters';
 import StatusBadge from '../components/common/StatusBadge';
 import { showConfirm, showSuccess, showError } from '../components/common/ConfirmDialog';
+import DetailModal from '../components/common/DetailModal';
+import ViewToggle from '../components/common/ViewToggle';
 
 const defaultForm = {
   guest_name: '',
@@ -19,6 +21,8 @@ export default function Waitlist() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ ...defaultForm });
+  const [selectedEntry, setSelectedEntry] = useState(null);
+  const [viewMode, setViewMode] = useState('table');
 
   useEffect(() => {
     loadWaitlist();
@@ -88,6 +92,11 @@ export default function Waitlist() {
         </button>
       </div>
 
+      <div className="toolbar">
+        <ViewToggle view={viewMode} onChange={setViewMode} />
+      </div>
+
+      {viewMode === 'table' ? (
       <div className="table-wrap">
         <table>
           <thead>
@@ -103,7 +112,7 @@ export default function Waitlist() {
           </thead>
           <tbody>
             {entries.map(entry => (
-              <tr key={entry.id}>
+              <tr key={entry.id} className="clickable-row" onClick={() => setSelectedEntry(entry)}>
                 <td><strong>{entry.guest_name}</strong></td>
                 <td>
                   {entry.guest_phone && <div>{entry.guest_phone}</div>}
@@ -117,7 +126,7 @@ export default function Waitlist() {
                 <td className="text-muted">{entry.notes || '-'}</td>
                 <td>
                   <select className="status-select" value={entry.status}
-                    onChange={e => handleStatusChange(entry, e.target.value)}>
+                    onChange={e => { e.stopPropagation(); handleStatusChange(entry, e.target.value); }}>
                     <option value="waiting">Waiting</option>
                     <option value="notified">Notified</option>
                     <option value="booked">Booked</option>
@@ -126,7 +135,7 @@ export default function Waitlist() {
                 </td>
                 <td>
                   <button className="btn-icon btn-icon-danger" title="Remove"
-                    onClick={() => handleDelete(entry)}>
+                    onClick={e => { e.stopPropagation(); handleDelete(entry); }}>
                     <i className="fas fa-trash"></i>
                   </button>
                 </td>
@@ -140,6 +149,44 @@ export default function Waitlist() {
           </tbody>
         </table>
       </div>
+      ) : (
+      <div className="card-grid">
+        {entries.map(entry => (
+          <div key={entry.id} className="card-grid-item" onClick={() => setSelectedEntry(entry)}>
+            <div className="card-grid-head">
+              <strong className="text-truncate">{entry.guest_name}</strong>
+              <StatusBadge status={entry.status} />
+            </div>
+            <div className="card-grid-body">
+              <div><span className="text-muted">Phone:</span> {entry.guest_phone || '-'}</div>
+              <div><span className="text-muted">Email:</span> {entry.guest_email || '-'}</div>
+              <div><span className="text-muted">Room:</span> <span className="text-capitalize">{entry.preferred_room_type}</span></div>
+              <div><span className="text-muted">Check-In:</span> {entry.check_in_date ? formatDate(entry.check_in_date) : '-'}</div>
+              <div><span className="text-muted">Check-Out:</span> {entry.check_out_date ? formatDate(entry.check_out_date) : '-'}</div>
+              {entry.notes && <div className="text-wrap"><span className="text-muted">Notes:</span> {entry.notes}</div>}
+            </div>
+            <div className="card-grid-actions">
+              <select className="status-select" value={entry.status}
+                onChange={e => { e.stopPropagation(); handleStatusChange(entry, e.target.value); }}>
+                <option value="waiting">Waiting</option>
+                <option value="notified">Notified</option>
+                <option value="booked">Booked</option>
+                <option value="expired">Expired</option>
+              </select>
+              <button className="btn-icon btn-icon-danger" title="Remove"
+                onClick={e => { e.stopPropagation(); handleDelete(entry); }}>
+                <i className="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        ))}
+        {entries.length === 0 && (
+          <div className="text-center text-muted py-3" style={{ gridColumn: '1 / -1' }}>
+            No one on the waitlist. Click "Add to Waitlist" to add a guest.
+          </div>
+        )}
+      </div>
+      )}
 
       {showForm && (
         <div className="modal-overlay" onClick={() => setShowForm(false)}>
@@ -205,6 +252,21 @@ export default function Waitlist() {
         </div>
       )}
 
+      {selectedEntry && (
+        <DetailModal item={selectedEntry} title="Waitlist Entry"
+          fields={[
+            { key: 'guest_name', label: 'Guest Name' },
+            { key: 'guest_phone', label: 'Phone' },
+            { key: 'guest_email', label: 'Email' },
+            { key: 'preferred_room_type', label: 'Room Type' },
+            { key: 'check_in_date', label: 'Check-In', render: v => formatDate(v) },
+            { key: 'check_out_date', label: 'Check-Out', render: v => formatDate(v) },
+            { key: 'notes', label: 'Notes', hide: v => !v },
+            { key: 'created_at', label: 'Added', render: v => formatDate(v) },
+          ]}
+          onClose={() => setSelectedEntry(null)} />
+      )}
+
       <style>{`
         .status-select {
           padding: 4px 8px; border-radius: 100px;
@@ -244,6 +306,41 @@ export default function Waitlist() {
           display: flex; justify-content: flex-end; gap: 8px;
           padding: 16px 24px; border-top: 1px solid var(--border);
         }
+        .toolbar {
+          display: flex; align-items: center; justify-content: flex-end;
+          margin-bottom: 16px;
+        }
+        .clickable-row { cursor: pointer; transition: var(--transition); }
+        .clickable-row:hover { background: var(--bg-alt); }
+        .card-grid {
+          display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 16px;
+        }
+        .card-grid-item {
+          background: var(--bg-card); border: 1px solid var(--border);
+          border-radius: var(--radius-lg); padding: 16px;
+          cursor: pointer; transition: var(--transition);
+        }
+        .card-grid-item:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+        .card-grid-head {
+          display: flex; justify-content: space-between; align-items: center;
+          margin-bottom: 12px; padding-bottom: 12px;
+          border-bottom: 1px solid var(--border-light);
+        }
+        .card-grid-head strong { font-size: 1rem; }
+        .card-grid-body { font-size: 0.85rem; }
+        .card-grid-body > div { padding: 4px 0; }
+        .card-grid-actions {
+          display: flex; justify-content: flex-end; align-items: center; gap: 8px;
+          margin-top: 12px; padding-top: 12px;
+          border-top: 1px solid var(--border-light);
+        }
+        .text-truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 100%; }
+        .text-wrap { white-space: normal; word-break: break-word; overflow-wrap: break-word; }
+        .card-grid-item { overflow: hidden; }
+        .card-grid-body { min-width: 0; }
+        .card-grid-head strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+        .card-grid-body > div { overflow: hidden; text-overflow: ellipsis; }
       `}</style>
     </div>
   );

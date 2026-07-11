@@ -3,6 +3,8 @@ import { fetchAll, insertRecord, updateRecord, removeRecord } from '../services/
 import { formatDate } from '../utils/formatters';
 import FileUpload from '../components/common/FileUpload';
 import { showConfirm, showSuccess, showError } from '../components/common/ConfirmDialog';
+import DetailModal from '../components/common/DetailModal';
+import ViewToggle from '../components/common/ViewToggle';
 
 export default function Guests() {
   const [guests, setGuests] = useState([]);
@@ -10,6 +12,8 @@ export default function Guests() {
   const [showForm, setShowForm] = useState(false);
   const [editGuest, setEditGuest] = useState(null);
   const [search, setSearch] = useState('');
+  const [selectedGuest, setSelectedGuest] = useState(null);
+  const [viewMode, setViewMode] = useState('table');
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', id_card_front: '', id_card_back: '' });
 
   useEffect(() => {
@@ -94,60 +98,89 @@ export default function Guests() {
         <button className="btn btn-primary" onClick={openNew}><i className="fas fa-plus"></i> Add Guest</button>
       </div>
 
-      <div className="card mb-2">
+      <div className="flex gap-1 mb-2">
         <input className="form-control" placeholder="Search by name, phone or email..." value={search}
           onChange={e => setSearch(e.target.value)} />
+        <ViewToggle view={viewMode} onChange={setViewMode} />
       </div>
 
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Address</th>
-              <th>ID Card</th>
-              <th>Registered</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map(g => (
-              <tr key={g.id}>
-                <td><strong>{g.name}</strong></td>
-                <td>{g.email || '-'}</td>
-                <td>{g.phone || '-'}</td>
-                <td className="text-muted">{g.address || '-'}</td>
-                <td>
-                  <div className="flex gap-1">
-                    {g.id_card_front
-                      ? <a href={g.id_card_front} target="_blank" rel="noreferrer" className="id-link" title="View Front"><i className="fas fa-id-card"></i> Front</a>
-                      : <span className="text-muted">-</span>
-                    }
-                    {g.id_card_back
-                      ? <a href={g.id_card_back} target="_blank" rel="noreferrer" className="id-link" title="View Back"><i className="fas fa-id-card"></i> Back</a>
-                      : null
-                    }
-                  </div>
-                </td>
-                <td className="text-muted">{formatDate(g.created_at)}</td>
-                <td>
-                  <div className="flex gap-1">
-                    <button className="btn-icon" onClick={() => openEdit(g)} title="Edit"><i className="fas fa-edit"></i></button>
-                    <button className="btn-icon btn-icon-danger" onClick={() => handleDelete(g)} title="Delete"><i className="fas fa-trash"></i></button>
-                  </div>
-                </td>
+      {viewMode === 'table' ? (
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>ID Card</th>
+                <th>Registered</th>
+                <th>Actions</th>
               </tr>
-            ))}
-            {filtered.length === 0 && (
-              <tr><td colSpan="7" className="text-center text-muted py-3">
-                {search ? 'No matching guests.' : 'No guests yet.'}
-              </td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {filtered.map(g => (
+                <tr key={g.id} className="clickable-row" onClick={() => setSelectedGuest(g)}>
+                  <td><strong>{g.name}</strong></td>
+                  <td>{g.email || '-'}</td>
+                  <td>{g.phone || '-'}</td>
+                  <td className="text-muted">{g.address || '-'}</td>
+                  <td>
+                    <div className="flex gap-1">
+                      {g.id_card_front
+                        ? <a href={g.id_card_front} target="_blank" rel="noreferrer" className="id-link" title="View Front"><i className="fas fa-id-card"></i> Front</a>
+                        : <span className="text-muted">-</span>
+                      }
+                      {g.id_card_back
+                        ? <a href={g.id_card_back} target="_blank" rel="noreferrer" className="id-link" title="View Back"><i className="fas fa-id-card"></i> Back</a>
+                        : null
+                      }
+                    </div>
+                  </td>
+                  <td className="text-muted">{formatDate(g.created_at)}</td>
+                  <td>
+                    <div className="flex gap-1" onClick={e => e.stopPropagation()}>
+                      <button className="btn-icon" onClick={() => openEdit(g)} title="Edit"><i className="fas fa-edit"></i></button>
+                      <button className="btn-icon btn-icon-danger" onClick={() => handleDelete(g)} title="Delete"><i className="fas fa-trash"></i></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr><td colSpan="7" className="text-center text-muted py-3">
+                  {search ? 'No matching guests.' : 'No guests yet.'}
+                </td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="card-grid">
+          {filtered.map(g => (
+            <div key={g.id} className="card-grid-item" onClick={() => setSelectedGuest(g)}>
+              <div className="card-grid-head">
+                <strong className="text-truncate">{g.name}</strong>
+                <span>{g.loyalty_points ?? 0} pts</span>
+              </div>
+              <div className="card-grid-body">
+                <span className="text-truncate"><i className="fas fa-envelope"></i> {g.email || '-'}</span>
+                <span className="text-truncate"><i className="fas fa-phone"></i> {g.phone || '-'}</span>
+                <span className="text-truncate"><i className="fas fa-map-marker-alt"></i> {g.address || '-'}</span>
+                <span className="text-truncate"><i className="fas fa-calendar"></i> {formatDate(g.created_at)}</span>
+              </div>
+              <div className="card-grid-actions" onClick={e => e.stopPropagation()}>
+                <button className="btn btn-sm btn-outline" onClick={() => openEdit(g)}><i className="fas fa-edit"></i> Edit</button>
+                <button className="btn btn-sm btn-outline-danger" onClick={() => handleDelete(g)}><i className="fas fa-trash"></i> Delete</button>
+              </div>
+            </div>
+          ))}
+          {filtered.length === 0 && (
+            <div className="text-center text-muted py-3">
+              {search ? 'No matching guests.' : 'No guests yet.'}
+            </div>
+          )}
+        </div>
+      )}
 
       {showForm && (
         <div className="modal-overlay" onClick={() => setShowForm(false)}>
@@ -225,6 +258,19 @@ export default function Guests() {
         </div>
       )}
 
+      {selectedGuest && (
+        <DetailModal item={selectedGuest} title="Guest Details"
+          fields={[
+            { key: 'name', label: 'Name' },
+            { key: 'email', label: 'Email' },
+            { key: 'phone', label: 'Phone' },
+            { key: 'address', label: 'Address' },
+            { key: 'loyalty_points', label: 'Loyalty Points' },
+            { key: 'created_at', label: 'Registered', render: v => formatDate(v) },
+          ]}
+          onClose={() => setSelectedGuest(null)} />
+      )}
+
       <style>{`
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
         .modal-content { background: var(--white); border-radius: var(--radius-lg); width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
@@ -241,6 +287,20 @@ export default function Guests() {
         .file-linked { display: inline-flex; align-items: center; gap: 4px; font-size: 0.8rem; color: var(--primary); margin-top: 4px; text-decoration: none; }
         .file-linked:hover { text-decoration: underline; }
         .py-3 { padding-top: 24px; padding-bottom: 24px; }
+        .clickable-row { cursor: pointer; transition: var(--transition); }
+        .clickable-row:hover { background: var(--bg-alt); }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+        .card-grid-item { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; cursor: pointer; transition: var(--transition); }
+        .card-grid-item:hover { box-shadow: var(--shadow-md); border-color: var(--primary); transform: translateY(-1px); }
+        .card-grid-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .card-grid-head strong { font-size: 1rem; }
+        .card-grid-body { display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; }
+        .card-grid-body i { width: 18px; color: var(--text-muted); }
+        .card-grid-actions { display: flex; gap: 6px; flex-wrap: wrap; padding-top: 10px; border-top: 1px solid var(--border-light); }
+        .text-truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 100%; }
+        .text-wrap { white-space: normal; word-break: break-word; overflow-wrap: break-word; }
+        .card-grid-item { overflow: hidden; }
+        .card-grid-body { min-width: 0; }
       `}</style>
     </div>
   );

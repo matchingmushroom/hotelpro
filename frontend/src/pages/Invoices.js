@@ -8,6 +8,8 @@ import LineItemForm from '../components/finance/LineItemForm';
 import PrintPreview from '../components/finance/PrintPreview';
 import FileUpload from '../components/common/FileUpload';
 import { sendEmail } from '../services/backendService';
+import DetailModal from '../components/common/DetailModal';
+import ViewToggle from '../components/common/ViewToggle';
 
 export default function Invoices() {
   const [searchParams] = useSearchParams();
@@ -22,6 +24,8 @@ export default function Invoices() {
   const [showPayment, setShowPayment] = useState(null);
   const [items, setItems] = useState([]);
   const [statusFilter, setStatusFilter] = useState('');
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [viewMode, setViewMode] = useState('table');
 
   const [form, setForm] = useState({
     guest_name: '', guest_email: '', guest_phone: '',
@@ -195,80 +199,113 @@ export default function Invoices() {
         </div>
       </div>
 
-      <div className="card mb-2" style={{ maxWidth: 200 }}>
-        <select className="form-control" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-          <option value="">All Invoices</option>
-          <option value="draft">Draft</option>
-          <option value="sent">Sent</option>
-          <option value="paid">Paid</option>
-          <option value="partial">Partial</option>
-          <option value="overdue">Overdue</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
+      <div className="flex gap-1 mb-2" style={{ alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="card" style={{ maxWidth: 200, flex: '1 1 auto' }}>
+          <select className="form-control" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+            <option value="">All Invoices</option>
+            <option value="draft">Draft</option>
+            <option value="sent">Sent</option>
+            <option value="paid">Paid</option>
+            <option value="partial">Partial</option>
+            <option value="overdue">Overdue</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <ViewToggle viewMode={viewMode} onChange={setViewMode} />
       </div>
 
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Guest</th>
-              <th>Total</th>
-              <th>Paid</th>
-              <th>Balance</th>
-              <th>Due Date</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map(inv => (
-              <tr key={inv.id} className={inv.status === 'overdue' ? 'row-overdue' : ''}>
-                <td><strong>{inv.guest_name}</strong></td>
-                <td>{formatCurrency(inv.total)}</td>
-                <td className="text-success">{formatCurrency(inv.amount_paid || 0)}</td>
-                <td><strong>{formatCurrency(inv.balance || inv.total)}</strong></td>
-                <td>{inv.due_date ? formatDate(inv.due_date) : '-'}</td>
-                <td><StatusBadge status={inv.status} /></td>
-                <td>
-                  <div className="flex gap-1" style={{ flexWrap: 'wrap' }}>
-                    <button className="btn btn-outline btn-sm" onClick={() => setPreviewInvoice(inv)} title="Preview">
-                      <i className="fas fa-eye"></i>
-                    </button>
-                    <button className="btn btn-outline btn-sm" onClick={() => { setEditInvoice(inv); setForm({ guest_name: inv.guest_name, guest_email: inv.guest_email || '', guest_phone: '', due_date: inv.due_date || '', notes: inv.notes || '', quote_id: inv.quote_id }); setItems(typeof inv.items === 'string' ? JSON.parse(inv.items) : (inv.items || [])); setShowForm(true); }} title="Edit">
-                      <i className="fas fa-edit"></i>
-                    </button>
-                    {inv.status !== 'paid' && inv.status !== 'cancelled' && (
-                      <button className="btn btn-primary btn-sm" onClick={() => { setShowPayment(inv); setPaymentForm({ amount: inv.balance || inv.total, payment_method_id: '', reference: '', notes: '' }); }} title="Record Payment">
-                        <i className="fas fa-money-bill"></i>
-                      </button>
-                    )}
-                    {inv.status === 'sent' && inv.guest_email && (
-                      <button className="btn btn-primary btn-sm" onClick={() => handleSend(inv)} title="Send Email">
-                        <i className="fas fa-paper-plane"></i>
-                      </button>
-                    )}
-                    <select className="status-select" value={inv.status}
-                      onChange={e => handleStatusChange(inv, e.target.value)}>
-                      <option value="draft">Draft</option>
-                      <option value="sent">Sent</option>
-                      <option value="paid">Paid</option>
-                      <option value="partial">Partial</option>
-                      <option value="overdue">Overdue</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                    <button className="btn btn-danger btn-sm" onClick={() => handleDelete(inv)} title="Delete">
-                      <i className="fas fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
+      {viewMode === 'table' ? (
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Guest</th>
+                <th>Total</th>
+                <th>Paid</th>
+                <th>Balance</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-            {filtered.length === 0 && (
-              <tr><td colSpan="7" className="text-center text-muted py-3">No invoices found.</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {filtered.map(inv => (
+                <tr key={inv.id} className={`${inv.status === 'overdue' ? 'row-overdue' : ''} clickable-row`} onClick={() => setSelectedInvoice(inv)}>
+                  <td><strong>{inv.guest_name}</strong></td>
+                  <td>{formatCurrency(inv.total)}</td>
+                  <td className="text-success">{formatCurrency(inv.amount_paid || 0)}</td>
+                  <td><strong>{formatCurrency(inv.balance || inv.total)}</strong></td>
+                  <td>{inv.due_date ? formatDate(inv.due_date) : '-'}</td>
+                  <td><StatusBadge status={inv.status} /></td>
+                  <td>
+                    <div className="flex gap-1" style={{ flexWrap: 'wrap' }} onClick={e => e.stopPropagation()}>
+                      <button className="btn btn-outline btn-sm" onClick={() => setPreviewInvoice(inv)} title="Preview">
+                        <i className="fas fa-eye"></i>
+                      </button>
+                      <button className="btn btn-outline btn-sm" onClick={() => { setEditInvoice(inv); setForm({ guest_name: inv.guest_name, guest_email: inv.guest_email || '', guest_phone: '', due_date: inv.due_date || '', notes: inv.notes || '', quote_id: inv.quote_id }); setItems(typeof inv.items === 'string' ? JSON.parse(inv.items) : (inv.items || [])); setShowForm(true); }} title="Edit">
+                        <i className="fas fa-edit"></i>
+                      </button>
+                      {inv.status !== 'paid' && inv.status !== 'cancelled' && (
+                        <button className="btn btn-primary btn-sm" onClick={() => { setShowPayment(inv); setPaymentForm({ amount: inv.balance || inv.total, payment_method_id: '', reference: '', notes: '' }); }} title="Record Payment">
+                          <i className="fas fa-money-bill"></i>
+                        </button>
+                      )}
+                      {inv.status === 'sent' && inv.guest_email && (
+                        <button className="btn btn-primary btn-sm" onClick={() => handleSend(inv)} title="Send Email">
+                          <i className="fas fa-paper-plane"></i>
+                        </button>
+                      )}
+                      <select className="status-select" value={inv.status}
+                        onChange={e => handleStatusChange(inv, e.target.value)}>
+                        <option value="draft">Draft</option>
+                        <option value="sent">Sent</option>
+                        <option value="paid">Paid</option>
+                        <option value="partial">Partial</option>
+                        <option value="overdue">Overdue</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                      <button className="btn btn-danger btn-sm" onClick={() => handleDelete(inv)} title="Delete">
+                        <i className="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr><td colSpan="7" className="text-center text-muted py-3">No invoices found.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="card-grid">
+          {filtered.map(inv => (
+            <div key={inv.id} className="card-grid-item" onClick={() => setSelectedInvoice(inv)}>
+              <div className="card-grid-head">
+<strong className="text-truncate">{inv.guest_name}</strong>
+                <StatusBadge status={inv.status} />
+              </div>
+              <div className="card-grid-body">
+                <div className="text-truncate"><i className="fas fa-tag"></i> Total: {formatCurrency(inv.total)}</div>
+                <div className="text-truncate"><i className="fas fa-check-circle"></i> Paid: {formatCurrency(inv.amount_paid || 0)}</div>
+                <div className="text-truncate"><i className="fas fa-exclamation-circle"></i> Balance: {formatCurrency(inv.balance || inv.total)}</div>
+                <div className="text-truncate"><i className="fas fa-calendar"></i> Due: {inv.due_date ? formatDate(inv.due_date) : '-'}</div>
+              </div>
+              <div className="card-grid-actions" onClick={e => e.stopPropagation()}>
+                <button className="btn btn-outline btn-sm" onClick={() => setPreviewInvoice(inv)} title="Preview"><i className="fas fa-eye"></i></button>
+                <button className="btn btn-outline btn-sm" onClick={() => { setEditInvoice(inv); setForm({ guest_name: inv.guest_name, guest_email: inv.guest_email || '', guest_phone: '', due_date: inv.due_date || '', notes: inv.notes || '', quote_id: inv.quote_id }); setItems(typeof inv.items === 'string' ? JSON.parse(inv.items) : (inv.items || [])); setShowForm(true); }} title="Edit"><i className="fas fa-edit"></i></button>
+                {inv.status !== 'paid' && inv.status !== 'cancelled' && (
+                  <button className="btn btn-primary btn-sm" onClick={() => { setShowPayment(inv); setPaymentForm({ amount: inv.balance || inv.total, payment_method_id: '', reference: '', notes: '' }); }} title="Record Payment"><i className="fas fa-money-bill"></i></button>
+                )}
+                <button className="btn btn-danger btn-sm" onClick={() => handleDelete(inv)} title="Delete"><i className="fas fa-trash"></i></button>
+              </div>
+            </div>
+          ))}
+          {filtered.length === 0 && (
+            <div className="text-center text-muted py-3">No invoices found.</div>
+          )}
+        </div>
+      )}
 
       {showForm && (
         <div className="modal-overlay" onClick={() => setShowForm(false)}>
@@ -390,6 +427,25 @@ export default function Invoices() {
         </div>
       )}
 
+      {selectedInvoice && (
+        <DetailModal
+          item={selectedInvoice}
+          title="Invoice Details"
+          fields={[
+            { key: 'guest_name', label: 'Guest' },
+            { key: 'guest_email', label: 'Email' },
+            { key: 'total', label: 'Total', render: v => formatCurrency(v) },
+            { key: 'amount_paid', label: 'Paid', render: v => formatCurrency(v) },
+            { key: 'balance', label: 'Balance', render: v => formatCurrency(v) },
+            { key: 'status', label: 'Status', render: v => <StatusBadge status={v} /> },
+            { key: 'due_date', label: 'Due Date', render: v => formatDate(v) },
+            { key: 'created_at', label: 'Created', render: v => formatDate(v) },
+            { key: 'notes', label: 'Notes', hide: v => !v },
+          ]}
+          onClose={() => setSelectedInvoice(null)}
+        />
+      )}
+
       <style>{`
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
         .modal-content { background: var(--white); border-radius: var(--radius-lg); width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
@@ -404,6 +460,25 @@ export default function Invoices() {
         .btn-danger:hover { opacity: 0.9; }
         .row-overdue { background: rgba(239,68,68,0.05); }
         .py-3 { padding-top: 24px; padding-bottom: 24px; }
+        .clickable-row { cursor: pointer; transition: var(--transition); }
+        .clickable-row:hover { background: var(--bg-alt); }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+        .card-grid-item {
+          background: var(--bg-card); border-radius: var(--radius-lg);
+          box-shadow: var(--shadow); padding: 16px; cursor: pointer;
+          transition: var(--transition); border: 1px solid var(--border);
+        }
+        .card-grid-item:hover { box-shadow: var(--shadow-md); border-color: var(--primary); transform: translateY(-1px); }
+        .card-grid-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .card-grid-head strong { font-size: 1rem; }
+        .card-grid-body { display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; }
+        .card-grid-body i { width: 18px; color: var(--text-muted); }
+        .card-grid-actions { display: flex; gap: 6px; flex-wrap: wrap; padding-top: 10px; border-top: 1px solid var(--border-light); }
+        .text-truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 100%; }
+        .text-wrap { white-space: normal; word-break: break-word; overflow-wrap: break-word; }
+        .card-grid-item { overflow: hidden; }
+        .card-grid-body { min-width: 0; }
+        .card-grid-head strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       `}</style>
     </div>
   );

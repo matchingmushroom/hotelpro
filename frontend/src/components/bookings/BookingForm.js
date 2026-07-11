@@ -17,7 +17,7 @@ export default function BookingForm({ onClose, onSuccess, defaultType = 'regular
     guest_name: '',
     guest_email: '',
     guest_phone: '',
-    room_id: '',
+    room_ids: [],
     check_in_date: '',
     check_out_date: '',
     adults: 1,
@@ -84,7 +84,7 @@ export default function BookingForm({ onClose, onSuccess, defaultType = 'regular
     if (!form.check_out_date) errs.check_out_date = 'Check-out date required';
     if (form.check_in_date && form.check_out_date && !isValidDateRange(form.check_in_date, form.check_out_date))
       errs.check_out_date = 'Check-out must be after check-in';
-    if (!form.room_id) errs.room_id = 'Please select a room';
+    if (!form.room_ids || form.room_ids.length === 0) errs.room_ids = 'Please select at least one room';
     return errs;
   }
 
@@ -100,23 +100,44 @@ export default function BookingForm({ onClose, onSuccess, defaultType = 'regular
 
     setSubmitting(true);
     try {
-      const payload = {
-        ...form,
-        hotel_id: undefined,
+      const multi = form.room_ids.length > 1;
+      let groupId = null;
+      if (multi) {
+        const group = await insertRecord('group_bookings', {
+          name: form.guest_name,
+          contact_person: form.guest_name,
+          contact_phone: form.guest_phone,
+          check_in_date: form.check_in_date,
+          check_out_date: form.check_out_date,
+          notes: form.special_requests || '',
+          total_rooms: form.room_ids.length,
+          status: 'confirmed',
+        });
+        groupId = group.id;
+      }
+      const base = {
+        guest_name: form.guest_name,
+        guest_email: form.guest_email,
+        guest_phone: form.guest_phone,
+        guest_id: form.guest_id || undefined,
+        group_id: groupId,
+        check_in_date: form.check_in_date,
+        check_out_date: form.check_out_date,
         adults: parseInt(form.adults),
         children: parseInt(form.children),
+        special_requests: form.special_requests,
+        booking_type: multi ? 'group' : form.booking_type,
+        status: 'confirmed',
       };
+      if (base.guest_id) { delete base.guest_name; delete base.guest_email; delete base.guest_phone; }
 
-      if (form.guest_id) {
-        delete payload.guest_name;
-        delete payload.guest_email;
-        delete payload.guest_phone;
+      let lastBooking;
+      for (const roomId of form.room_ids) {
+        lastBooking = await insertRecord('bookings', { ...base, room_id: roomId });
+        await updateRecord('rooms', roomId, { status: 'occupied' });
       }
 
-      const booking = await insertRecord('bookings', payload);
-      await updateRecord('rooms', form.room_id, { status: 'occupied' });
-
-      onSuccess?.(booking);
+      onSuccess?.(lastBooking);
     } catch (err) {
       setErrors({ submit: err.message });
     } finally {
@@ -185,22 +206,28 @@ export default function BookingForm({ onClose, onSuccess, defaultType = 'regular
 
               {form.check_in_date && form.check_out_date && (
                 <div className="form-group">
-                  <label>Select Room *</label>
-                  {errors.room_id && <div className="form-error">{errors.room_id}</div>}
+                  <label>Select Rooms ({form.room_ids.length} selected) *</label>
+                  {errors.room_ids && <div className="form-error">{errors.room_ids}</div>}
                   <div className="room-select-grid">
-                    {availableRooms.map(room => (
-                      <div key={room.id} className={`room-option ${form.room_id === room.id ? 'selected' : ''}`}
-                        onClick={() => setForm(prev => ({ ...prev, room_id: room.id }))}>
-                        <div className="room-option-header">
-                          <strong>{room.room_number}</strong>
-                          <span className="text-capitalize">{room.room_type}</span>
+                    {availableRooms.map(room => {
+                      const selected = form.room_ids.includes(room.id);
+                      return (
+                        <div key={room.id} className={`room-option ${selected ? 'selected' : ''}`}
+                          onClick={() => setForm(prev => ({
+                            ...prev,
+                            room_ids: selected ? prev.room_ids.filter(id => id !== room.id) : [...prev.room_ids, room.id]
+                          }))}>
+                          <div className="room-option-header">
+                            <strong>{room.room_number}</strong>
+                            {selected && <i className="fas fa-check-circle" style={{color:'var(--primary)'}} />}
+                          </div>
+                          <div className="room-option-footer">
+                            <span>{formatCurrency(room.price_per_night)}/night</span>
+                            <span>{room.capacity} guests</span>
+                          </div>
                         </div>
-                        <div className="room-option-footer">
-                          <span>{formatCurrency(room.price_per_night)}/night</span>
-                          <span>{room.capacity} guests</span>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                     {availableRooms.length === 0 && (
                       <p className="text-muted">No rooms available for selected dates.</p>
                     )}
@@ -274,8 +301,8 @@ export default function BookingForm({ onClose, onSuccess, defaultType = 'regular
               <div className="summary-card">
                 <h3>Booking Summary</h3>
                 <div className="summary-row">
-                  <span>Room</span>
-                  <span>{rooms.find(r => r.id === form.room_id)?.room_number || form.room_id} - {rooms.find(r => r.id === form.room_id)?.room_type}</span>
+                  <span>Rooms</span>
+                  <span>{form.room_ids.map(id => rooms.find(r => r.id === id)?.room_number).filter(Boolean).join(', ')}</span>
                 </div>
                 <div className="summary-row">
                   <span>Check-In</span>
@@ -294,10 +321,11 @@ export default function BookingForm({ onClose, onSuccess, defaultType = 'regular
                   <span>{form.adults} adults, {form.children} children</span>
                 </div>
                 <div className="summary-row summary-total">
-                  <span>Total Nights</span>
-                  <span>
-                    {Math.max(1, Math.ceil((new Date(form.check_out_date) - new Date(form.check_in_date)) / (1000*60*60*24)))}
-                  </span>
+                  <span>Total per Night</span>
+                  <span>{formatCurrency(form.room_ids.reduce((sum, id) => {
+                    const r = rooms.find(x => x.id === id);
+                    return sum + (parseFloat(r?.price_per_night) || 0);
+                  }, 0))}</span>
                 </div>
               </div>
               {errors.submit && <div className="alert alert-error mt-2">{errors.submit}</div>}
@@ -307,7 +335,7 @@ export default function BookingForm({ onClose, onSuccess, defaultType = 'regular
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={submitting}>
                   {submitting ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-check"></i>}
-                  {submitting ? 'Creating...' : 'Confirm Booking'}
+                  {submitting ? 'Creating...' : `Confirm Booking (${form.room_ids.length} room${form.room_ids.length > 1 ? 's' : ''})`}
                 </button>
               </div>
             </div>
@@ -346,7 +374,7 @@ export default function BookingForm({ onClose, onSuccess, defaultType = 'regular
           cursor: pointer; transition: var(--transition);
         }
         .room-option:hover { border-color: var(--primary); }
-        .room-option.selected { border-color: var(--primary); background: rgba(26,26,46,0.05); }
+        .room-option.selected { border-color: var(--primary); background: #eef2ff; }
         .room-option-header { display: flex; justify-content: space-between; margin-bottom: 4px; }
         .room-option-footer { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); }
         .search-result-item {

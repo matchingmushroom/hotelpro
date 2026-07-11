@@ -123,13 +123,26 @@ export default function GroupBooking() {
           <div className="form-group">
             <label>Select Rooms ({selectedRooms.length} selected)</label>
             <div className="room-grid">
-              {rooms.map(room => (
+              {rooms.filter(r => r.status === 'available').map(room => (
                 <div key={room.id}
                   className={`room-chip ${selectedRooms.includes(room.id) ? 'selected' : ''}`}
                   onClick={() => handleSelectRoom(room.id)}>
-                  <strong>{room.room_number}</strong>
-                  <span>{room.room_type} - {formatCurrency(room.price_per_night)}</span>
-                  <span className="badge badge-status">{room.status}</span>
+                  <div className="room-chip-top">
+                    <strong>{room.room_number}</strong>
+                    {selectedRooms.includes(room.id) && <i className="fas fa-check-circle" />}
+                  </div>
+                  <span>{room.room_type}</span>
+                  <span>{formatCurrency(room.price_per_night)} / night</span>
+                </div>
+              ))}
+              {rooms.filter(r => r.status !== 'available').map(room => (
+                <div key={room.id} className="room-chip disabled" title={`Room is ${room.status}`}>
+                  <div className="room-chip-top">
+                    <strong>{room.room_number}</strong>
+                    <span className="badge badge-status">{room.status}</span>
+                  </div>
+                  <span>{room.room_type}</span>
+                  <span className="text-muted">{room.status.replace('_', ' ')}</span>
                 </div>
               ))}
             </div>
@@ -138,8 +151,22 @@ export default function GroupBooking() {
           {selectedRooms.length > 0 && (
             <div className="form-group">
               <div className="summary-card">
-                <strong>Summary:</strong>
-                <span>{selectedRooms.length} rooms selected</span>
+                <div>
+                  <strong>{selectedRooms.length} room{selectedRooms.length > 1 ? 's' : ''} selected</strong>
+                  <div className="text-muted" style={{fontSize:'0.82rem',marginTop:4}}>
+                    {selectedRooms.map(id => {
+                      const r = rooms.find(x => x.id === id);
+                      return r?.room_number;
+                    }).filter(Boolean).join(', ')}
+                  </div>
+                </div>
+                <div style={{textAlign:'right'}}>
+                  <strong>{formatCurrency(selectedRooms.reduce((sum, id) => {
+                    const r = rooms.find(x => x.id === id);
+                    return sum + (parseFloat(r?.price_per_night) || 0);
+                  }, 0))}</strong>
+                  <div className="text-muted" style={{fontSize:'0.82rem'}}>per night</div>
+                </div>
               </div>
             </div>
           )}
@@ -159,21 +186,27 @@ export default function GroupBooking() {
       <style>{`
         .room-grid { display: flex; flex-wrap: wrap; gap: 8px; }
         .room-chip {
-          padding: 10px 16px; border: 2px solid var(--border); border-radius: var(--radius);
-          cursor: pointer; display: flex; flex-direction: column; gap: 2px;
-          min-width: 160px; transition: var(--transition);
+          padding: 12px 16px; border: 2px solid var(--border); border-radius: var(--radius);
+          cursor: pointer; display: flex; flex-direction: column; gap: 4px;
+          min-width: 170px; flex: 1 0 auto; max-width: 220px;
+          transition: all 0.2s; background: var(--bg-card);
         }
-        .room-chip:hover { border-color: var(--primary); }
-        .room-chip.selected { border-color: var(--primary); background: rgba(26,26,46,0.05); }
-        .room-chip span { font-size: 0.8rem; color: var(--text-muted); }
+        .room-chip:hover { border-color: var(--primary); box-shadow: var(--shadow-sm); }
+        .room-chip.selected { border-color: var(--primary); background: #eef2ff; }
+        .room-chip.disabled { opacity: 0.5; cursor: not-allowed; background: var(--bg); }
+        .room-chip.disabled:hover { border-color: var(--border); box-shadow: none; }
+        .room-chip-top { display: flex; justify-content: space-between; align-items: center; }
+        .room-chip-top i { color: var(--primary); font-size: 1.1rem; }
+        .room-chip span { font-size: 0.78rem; color: var(--text-muted); }
         .badge-status {
           display: inline-block; padding: 2px 8px; border-radius: 100px;
-          font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
-          background: var(--bg); color: var(--text-muted); margin-top: 4px;
+          font-size: 0.65rem; font-weight: 600; text-transform: capitalize;
+          background: #fee2e2; color: #991b1b;
         }
         .summary-card {
           display: flex; justify-content: space-between; align-items: center;
-          background: var(--bg); padding: 12px 16px; border-radius: var(--radius);
+          background: var(--bg); padding: 14px 18px; border-radius: var(--radius);
+          border: 1px solid var(--border-light);
         }
       `}</style>
     </div>

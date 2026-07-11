@@ -6,6 +6,8 @@ import { gasUploadFile } from '../services/gasService';
 import StatusBadge from '../components/common/StatusBadge';
 import { showConfirm, showSuccess, showError } from '../components/common/ConfirmDialog';
 import CheckoutBillModal from '../components/checkout/CheckoutBillModal';
+import DetailModal from '../components/common/DetailModal';
+import ViewToggle from '../components/common/ViewToggle';
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -24,15 +26,17 @@ export default function Bookings() {
   const [statusFilter, setStatusFilter] = useState('');
   const [guestMap, setGuestMap] = useState({});
   const [guestDataMap, setGuestDataMap] = useState({});
-  const [roomMap, setRoomMap] = useState({});
+const [roomMap, setRoomMap] = useState({});
+const [rooms, setRooms] = useState([]);
 
-  // Check-in modal state
+// Check-in modal state
   const [checkinModal, setCheckinModal] = useState(null);
   const [checkinPhone, setCheckinPhone] = useState('');
   const [checkinDocFile, setCheckinDocFile] = useState(null);
   const [checkinDocUploading, setCheckinDocUploading] = useState(false);
   const [checkinDocUrl, setCheckinDocUrl] = useState('');
   const [checkinSubmitting, setCheckinSubmitting] = useState(false);
+  const [companions, setCompanions] = useState([]);
 
   // Modify modal state
   const [modifyModal, setModifyModal] = useState(null);
@@ -41,6 +45,12 @@ export default function Bookings() {
 
   // Check-out modal state
   const [checkoutBooking, setCheckoutBooking] = useState(null);
+
+  // Detail popup + view toggle
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [viewMode, setViewMode] = useState('table');
+  const [groupHighlight, setGroupHighlight] = useState(null);
+  const [groupModal, setGroupModal] = useState(null);
 
   useEffect(() => {
     loadBookings();
@@ -62,6 +72,7 @@ export default function Bookings() {
       const rMap = {};
       (roomsRes.data || []).forEach(r => { rMap[r.id] = r.room_number; });
       setRoomMap(rMap);
+      setRooms(roomsRes.data || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -129,6 +140,11 @@ export default function Bookings() {
     setCheckinDocFile(null);
     setCheckinDocUrl('');
     setCheckinDocUploading(false);
+    const totalGuests = (booking.adults || 1) + (booking.children || 0);
+    const existing = booking.companions || [];
+    setCompanions(
+      Array.from({ length: Math.max(0, totalGuests - 1) }, (_, i) => existing[i] || { name: '', phone: '', address: '' })
+    );
   }
 
   async function handleCheckinDocSelect(e) {
@@ -155,6 +171,7 @@ export default function Bookings() {
       guest_name: booking.guest_name || guest?.name || '',
       guest_email: booking.guest_email || guest?.email || '',
       guest_phone: booking.guest_phone || guest?.phone || '',
+      room_id: booking.room_id || '',
       check_in_date: booking.check_in_date,
       check_out_date: booking.check_out_date,
       adults: booking.adults || 1,
@@ -168,7 +185,14 @@ export default function Bookings() {
     if (!modifyModal) return;
     setModifySubmitting(true);
     try {
-      await updateRecord('bookings', modifyModal.id, modifyForm);
+      const updates = { ...modifyForm };
+      if (!updates.room_id) delete updates.room_id;
+      await updateRecord('bookings', modifyModal.id, updates);
+      if (modifyForm.room_id && modifyForm.room_id !== modifyModal.room_id) {
+        if (modifyModal.room_id) await updateRecord('rooms', modifyModal.room_id, { status: 'available' });
+        const status = modifyModal.status === 'checked_in' ? 'occupied' : 'available';
+        await updateRecord('rooms', modifyForm.room_id, { status });
+      }
       showSuccess('Updated', 'Booking modified successfully');
       setModifyModal(null);
       loadBookings();
@@ -192,6 +216,7 @@ export default function Bookings() {
       const updates = { status: 'checked_in' };
       if (checkinDocUrl) updates.document_url = checkinDocUrl;
       if (guest) updates.guest_id = guest.id;
+      if (companions.some(c => c.name)) updates.companions = companions.filter(c => c.name);
       await updateRecord('bookings', checkinModal.id, updates);
       if (checkinModal.room_id) await updateRecord('rooms', checkinModal.room_id, { status: 'occupied' });
       showSuccess('Checked In', `${guestName(checkinModal)} checked in successfully${guest ? ' · Guest registered' : ''}`);
@@ -225,6 +250,14 @@ export default function Bookings() {
     return true;
   });
 
+  const groupMap = {};
+  bookings.forEach(b => {
+    if (b.group_id) {
+      if (!groupMap[b.group_id]) groupMap[b.group_id] = [];
+      groupMap[b.group_id].push(b.id);
+    }
+  });
+
   if (loading) return <div className="loading-spinner">Loading bookings...</div>;
 
   return (
@@ -250,83 +283,146 @@ export default function Bookings() {
       <div className="card mb-2 flex-between">
         <input className="form-control" style={{ maxWidth: 300 }} placeholder="Search by guest name..."
           value={search} onChange={e => setSearch(e.target.value)} />
-        <select className="form-control" style={{ maxWidth: 180 }} value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value)}>
-          <option value="">All Status</option>
-          <option value="confirmed">Confirmed</option>
-          <option value="checked_in">Checked In</option>
-          <option value="checked_out">Checked Out</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
+        <div className="flex gap-1" style={{ alignItems: 'center' }}>
+          <select className="form-control" style={{ maxWidth: 150 }} value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}>
+            <option value="">All Status</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="checked_in">Checked In</option>
+            <option value="checked_out">Checked Out</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <ViewToggle view={viewMode} onChange={setViewMode} />
+        </div>
       </div>
 
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Guest</th>
-              <th>Room</th>
-              <th>Check-In</th>
-              <th>Check-Out</th>
-              <th>Nights</th>
-              <th>Guests</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map(b => {
-              const nights = Math.max(1, Math.ceil((new Date(b.check_out_date) - new Date(b.check_in_date)) / (1000*60*60*24)));
-              return (
-                <tr key={b.id}>
-                  <td><strong>{guestName(b)}</strong></td>
-                  <td>Room {roomNumber(b)}</td>
-                  <td>{formatDate(b.check_in_date)}</td>
-                  <td>{formatDate(b.check_out_date)}</td>
-                  <td>{nights}</td>
-                  <td>{b.adults + (b.children || 0)}</td>
-                  <td className="text-capitalize">{b.booking_type}</td>
-                  <td><StatusBadge status={b.status} /></td>
-                  <td>
-                    <div className="table-actions">
-                      {b.status === 'checked_in' && (
-                        <button className="btn-icon btn-icon-checkout" title="Check Out"
-                          onClick={() => setCheckoutBooking(b)}>
-                          <i className="fas fa-sign-out-alt"></i>
-                        </button>
+      {viewMode === 'table' ? (
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Guest</th>
+                <th>Room</th>
+                <th>Check-In</th>
+                <th>Check-Out</th>
+                <th>Nights</th>
+                <th>Guests</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(b => {
+                const nights = Math.max(1, Math.ceil((new Date(b.check_out_date) - new Date(b.check_in_date)) / (1000*60*60*24)));
+                return (
+                  <tr key={b.id} className={`clickable-row${groupHighlight === b.group_id ? ' group-highlight' : ''}`} onClick={() => setSelectedBooking(b)}>
+                    <td><strong>{guestName(b)}</strong></td>
+                    <td>Room {roomNumber(b)}</td>
+                    <td>{formatDate(b.check_in_date)}</td>
+                    <td>{formatDate(b.check_out_date)}</td>
+                    <td>{nights}</td>
+                    <td>{b.adults + (b.children || 0)}</td>
+                    <td onClick={e => e.stopPropagation()}>
+                      {b.group_id && groupMap[b.group_id]?.length > 1 ? (
+                        <span className="group-badge" onClick={() => { setGroupModal(b.group_id); setGroupHighlight(b.group_id); }}>
+                          <i className="fas fa-users" /> Group · {groupMap[b.group_id].length}
+                        </span>
+                      ) : (
+                        <span className="text-capitalize">{b.booking_type}</span>
                       )}
-                      {['confirmed', 'checked_in'].includes(b.status) && (
-                        <button className="btn-icon" title="Modify"
-                          onClick={() => openModifyModal(b)}>
-                          <i className="fas fa-pen"></i>
-                        </button>
-                      )}
-                      {b.status === 'confirmed' && (
-                        <button className="btn-icon btn-icon-danger" title="Cancel"
-                          onClick={() => handleCancel(b)}>
-                          <i className="fas fa-ban"></i>
-                        </button>
-                      )}
-                      {b.status === 'confirmed' && (
-                        <button className="btn-icon" title="Check In"
-                          onClick={() => openCheckinModal(b)}>
-                          <i className="fas fa-sign-in-alt"></i>
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-            {filtered.length === 0 && (
-              <tr><td colSpan="9" className="text-center text-muted py-3">
-                {search ? 'No matching bookings.' : 'No bookings yet. Create one to get started.'}
-              </td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+                    </td>
+                    <td><StatusBadge status={b.status} /></td>
+                    <td onClick={e => e.stopPropagation()}>
+                      <div className="table-actions">
+                        {b.status === 'checked_in' && (
+                          <button className="btn-icon btn-icon-checkout" title="Check Out"
+                            onClick={() => setCheckoutBooking(b)}>
+                            <i className="fas fa-sign-out-alt"></i>
+                          </button>
+                        )}
+                        {['confirmed', 'checked_in'].includes(b.status) && (
+                          <button className="btn-icon" title="Modify"
+                            onClick={() => openModifyModal(b)}>
+                            <i className="fas fa-pen"></i>
+                          </button>
+                        )}
+                        {b.status === 'confirmed' && (
+                          <button className="btn-icon btn-icon-danger" title="Cancel"
+                            onClick={() => handleCancel(b)}>
+                            <i className="fas fa-ban"></i>
+                          </button>
+                        )}
+                        {b.status === 'confirmed' && (
+                          <button className="btn-icon" title="Check In"
+                            onClick={() => openCheckinModal(b)}>
+                            <i className="fas fa-sign-in-alt"></i>
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+              {filtered.length === 0 && (
+                <tr><td colSpan="9" className="text-center text-muted py-3">
+                  {search ? 'No matching bookings.' : 'No bookings yet. Create one to get started.'}
+                </td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="card-grid">
+          {filtered.map(b => {
+            const nights = Math.max(1, Math.ceil((new Date(b.check_out_date) - new Date(b.check_in_date)) / (1000*60*60*24)));
+            return (
+              <div key={b.id} className={`card-grid-item${groupHighlight === b.group_id ? ' group-highlight' : ''}`} onClick={() => setSelectedBooking(b)}>
+                <div className="card-grid-head">
+                  <strong className="text-truncate">{guestName(b)}</strong>
+                  <div className="flex gap-1" style={{alignItems:'center', flexShrink:0}}>
+                    {b.group_id && groupMap[b.group_id]?.length > 1 && (
+                      <span className="group-badge" onClick={e => { e.stopPropagation(); setGroupModal(b.group_id); setGroupHighlight(b.group_id); }}>
+                        <i className="fas fa-users" /> {groupMap[b.group_id].length}
+                      </span>
+                    )}
+                    <StatusBadge status={b.status} />
+                  </div>
+                </div>
+                <div className="card-grid-body">
+                  <span className="text-truncate"><i className="fas fa-door-open"></i> Room {roomNumber(b)}</span>
+                  <span className="text-truncate"><i className="fas fa-calendar"></i> {formatDate(b.check_in_date)} → {formatDate(b.check_out_date)}</span>
+                  <span className="text-truncate"><i className="fas fa-moon"></i> {nights} night{nights > 1 ? 's' : ''}</span>
+                  <span className="text-truncate"><i className="fas fa-user-friends"></i> {b.adults + (b.children || 0)} guests</span>
+                  <span className="text-truncate"><i className="fas fa-tag"></i> {b.booking_type}</span>
+                </div>
+                <div className="card-grid-actions" onClick={e => e.stopPropagation()}>
+                  {b.status === 'checked_in' && (
+                    <button className="btn btn-sm btn-accent" onClick={() => setCheckoutBooking(b)}>
+                      <i className="fas fa-sign-out-alt"></i> Check Out
+                    </button>
+                  )}
+                  {b.status === 'confirmed' && (
+                    <button className="btn btn-sm btn-primary" onClick={() => openCheckinModal(b)}>
+                      <i className="fas fa-sign-in-alt"></i> Check In
+                    </button>
+                  )}
+                  {['confirmed', 'checked_in'].includes(b.status) && (
+                    <button className="btn btn-sm btn-outline" onClick={() => openModifyModal(b)}>
+                      <i className="fas fa-pen"></i> Edit
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+          {filtered.length === 0 && (
+            <div className="card text-center text-muted py-3">
+              {search ? 'No matching bookings.' : 'No bookings yet.'}
+            </div>
+          )}
+        </div>
+      )}
 
       {modifyModal && (
         <div className="modal-overlay" onClick={() => setModifyModal(null)}>
@@ -355,6 +451,18 @@ export default function Bookings() {
                   <label>Phone</label>
                   <input className="form-control" value={modifyForm.guest_phone}
                     onChange={e => setModifyForm(f => ({...f, guest_phone: e.target.value}))} />
+                </div>
+                <div className="form-group">
+                  <label>Room</label>
+                  <select className="form-control" value={modifyForm.room_id}
+                    onChange={e => setModifyForm(f => ({...f, room_id: e.target.value}))}>
+                    <option value="">-- Select Room --</option>
+                    {rooms.filter(r => r.status === 'available' || r.id === modifyModal?.room_id).map(r => (
+                      <option key={r.id} value={r.id}>
+                        {r.room_number} ({r.room_type || 'N/A'}){r.id === modifyModal?.room_id ? ' · Current' : ''}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="form-row">
                   <div className="form-group">
@@ -396,6 +504,30 @@ export default function Bookings() {
             </form>
           </div>
         </div>
+      )}
+
+      {selectedBooking && (
+        <DetailModal
+          item={selectedBooking}
+          title="Booking Details"
+          fields={[
+            { key: 'id', label: 'Booking ID', render: v => v?.slice(0, 8) + '...' },
+            { key: 'guest_name', label: 'Guest', render: (v, b) => guestName(b) },
+            { key: 'guest_phone', label: 'Phone' },
+            { key: 'guest_email', label: 'Email' },
+            { key: 'room_id', label: 'Room', render: (v, b) => `Room ${roomNumber(b)}` },
+            { key: 'check_in_date', label: 'Check-In', render: v => formatDate(v) },
+            { key: 'check_out_date', label: 'Check-Out', render: v => formatDate(v) },
+            { key: 'status', label: 'Status', render: v => <StatusBadge status={v} /> },
+            { key: 'booking_type', label: 'Type', render: v => <span className="text-capitalize">{v}</span> },
+            { key: 'adults', label: 'Adults' },
+            { key: 'children', label: 'Children' },
+            { key: 'total_amount', label: 'Total Amount', render: v => v ? formatCurrency(v) : '-' },
+            { key: 'special_requests', label: 'Requests', hide: v => !v },
+            { key: 'created_at', label: 'Created', render: v => formatDate(v) },
+          ]}
+          onClose={() => setSelectedBooking(null)}
+        />
       )}
 
       {checkoutBooking && (
@@ -477,6 +609,78 @@ export default function Bookings() {
           </div>
         </div>
       )}
+
+      {groupModal && (() => {
+        const groupBookings = bookings.filter(b => b.group_id === groupModal);
+        const first = groupBookings[0];
+        return (
+          <div className="modal-overlay" onClick={() => { setGroupModal(null); setGroupHighlight(null); }}>
+            <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+              <div className="modal-header">
+                <h2><i className="fas fa-users" style={{color:'var(--primary)'}} /> Group Booking</h2>
+                <button className="modal-close" onClick={() => { setGroupModal(null); setGroupHighlight(null); }}>
+                  <i className="fas fa-times" />
+                </button>
+              </div>
+              <div className="modal-body" style={{ padding: 0 }}>
+                <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--border)' }}>
+                  <div style={{ fontWeight: 600 }}>{first?.guest_name || 'Group'}</div>
+                  <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                    {first?.check_in_date} → {first?.check_out_date} · {groupBookings.length} room{groupBookings.length > 1 ? 's' : ''}
+                  </div>
+                </div>
+                <div style={{ padding: '12px 20px 16px' }}>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Assigned Rooms
+                  </div>
+                  {groupBookings.map(b => {
+                    const room = rooms.find(r => r.id === b.room_id);
+                    return (
+                      <div key={b.id} className="group-room-row" onClick={() => { setSelectedBooking(b); setGroupModal(null); setGroupHighlight(null); }}>
+                        <div className="group-room-left">
+                          <strong>{room?.room_number || b.room_id?.slice(0, 8)}</strong>
+                          <span className="text-muted">{room?.room_type || '-'}</span>
+              </div>
+
+              {companions.length > 0 && (
+                <div style={{ marginTop: 16 }}>
+                  <label style={{ fontWeight: 600, fontSize: '0.85rem', display: 'block', marginBottom: 8 }}>
+                    <i className="fas fa-users" style={{marginRight:6}} />Other Guests Staying
+                  </label>
+                  {companions.map((c, i) => (
+                    <div key={i} style={{ padding: '12px', border: '1px solid var(--border)', borderRadius: 'var(--radius)', marginBottom: 8 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <span style={{ fontWeight: 600, fontSize: '0.82rem', color: 'var(--text-muted)' }}>Guest #{i + 2}</span>
+                        {c.name && <span className="btn btn-sm btn-outline" style={{fontSize:'0.72rem',padding:'2px 8px'}} onClick={() => setCompanions(prev => prev.map((x, j) => j === i ? { name: '', phone: '', address: '' } : x))}>Clear</span>}
+                      </div>
+                      <div className="form-row" style={{gap:8}}>
+                        <div className="form-group" style={{flex:2}}>
+                          <input className="form-control" placeholder="Full Name" value={c.name}
+                            onChange={e => setCompanions(prev => prev.map((x, j) => j === i ? {...x, name: e.target.value} : x))} />
+                        </div>
+                        <div className="form-group" style={{flex:1}}>
+                          <input className="form-control" placeholder="Mobile" value={c.phone}
+                            onChange={e => setCompanions(prev => prev.map((x, j) => j === i ? {...x, phone: e.target.value} : x))} />
+                        </div>
+                      </div>
+                      <div className="form-group" style={{marginTop:4}}>
+                        <input className="form-control" placeholder="Address (optional)" value={c.address}
+                          onChange={e => setCompanions(prev => prev.map((x, j) => j === i ? {...x, address: e.target.value} : x))} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+                        <StatusBadge status={b.status} />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       <style>{`
         .table-actions { display: flex; gap: 4px; }
@@ -599,6 +803,48 @@ export default function Bookings() {
         .btn-icon-danger:hover { background: #fef2f2; color: var(--error); }
         .btn-icon-checkout:hover { background: #f0fdf4; color: var(--success); }
         .py-3 { padding-top: 24px; padding-bottom: 24px; }
+        .clickable-row { cursor: pointer; transition: var(--transition); }
+        .clickable-row:hover { background: var(--bg-alt); }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+        .card-grid-item {
+          background: var(--bg-card); border-radius: var(--radius-lg);
+          box-shadow: var(--shadow); padding: 16px; cursor: pointer;
+          transition: var(--transition); border: 1px solid var(--border);
+        }
+        .card-grid-item:hover { box-shadow: var(--shadow-md); border-color: var(--primary); transform: translateY(-1px); }
+        .card-grid-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .card-grid-head strong { font-size: 1rem; }
+        .card-grid-body { display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; }
+        .card-grid-body i { width: 18px; color: var(--text-muted); }
+        .card-grid-actions { display: flex; gap: 6px; flex-wrap: wrap; padding-top: 10px; border-top: 1px solid var(--border-light); }
+        .text-truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 100%; }
+        .text-wrap { white-space: normal; word-break: break-word; overflow-wrap: break-word; }
+        .card-grid-item { overflow: hidden; }
+        .card-grid-body { min-width: 0; }
+        .group-badge {
+          display: inline-flex; align-items: center; gap: 4px;
+          padding: 2px 8px; border-radius: 100px;
+          font-size: 0.72rem; font-weight: 600;
+          background: #eef2ff; color: var(--primary);
+          cursor: pointer; transition: var(--transition);
+          white-space: nowrap;
+        }
+        .group-badge:hover { background: #dbeafe; }
+        .clickable-row.group-highlight,
+        .card-grid-item.group-highlight {
+          background: #eef2ff !important;
+          box-shadow: 0 0 0 2px var(--primary);
+        }
+        .card-grid-item.group-highlight { border-color: var(--primary); }
+        .group-room-row {
+          display: flex; justify-content: space-between; align-items: center;
+          padding: 10px 12px; border-radius: var(--radius);
+          cursor: pointer; transition: var(--transition); margin-bottom: 4px;
+        }
+        .group-room-row:hover { background: var(--bg-alt); }
+        .group-room-left { display: flex; flex-direction: column; gap: 1px; }
+        .group-room-left strong { font-size: 0.92rem; }
+        .group-room-left span { font-size: 0.78rem; }
       `}</style>
     </div>
   );

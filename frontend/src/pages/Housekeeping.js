@@ -3,6 +3,8 @@ import { fetchAll, insertRecord, updateRecord, removeRecord } from '../services/
 import { formatDate, formatDateTime } from '../utils/formatters';
 import StatusBadge from '../components/common/StatusBadge';
 import { showConfirm, showSuccess, showError } from '../components/common/ConfirmDialog';
+import DetailModal from '../components/common/DetailModal';
+import ViewToggle from '../components/common/ViewToggle';
 
 const priorityOrder = { high: 0, medium: 1, low: 2 };
 
@@ -15,6 +17,8 @@ export default function Housekeeping() {
   const [statusFilter, setStatusFilter] = useState('');
 
   const [form, setForm] = useState({ room_id: '', priority: 'medium', notes: '' });
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [viewMode, setViewMode] = useState('table');
 
   useEffect(() => {
     loadData();
@@ -88,6 +92,9 @@ export default function Housekeeping() {
     }
   }
 
+  const roomMap = Object.fromEntries(rooms.map(r => [r.id, r]));
+  const staffMap = Object.fromEntries(staff.map(s => [s.id, s]));
+
   const sorted = [...requests].sort((a, b) => (priorityOrder[a.priority] || 99) - (priorityOrder[b.priority] || 99));
   const filtered = statusFilter ? sorted.filter(r => r.status === statusFilter) : sorted;
 
@@ -106,72 +113,115 @@ export default function Housekeeping() {
       </div>
 
       <div className="card mb-2 flex-between">
-        <select className="form-control" style={{ maxWidth: 200 }} value={statusFilter}
-          onChange={e => setStatusFilter(e.target.value)}>
-          <option value="">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="in_progress">In Progress</option>
-          <option value="completed">Completed</option>
-        </select>
+        <div className="flex-between" style={{ gap: 12 }}>
+          <select className="form-control" style={{ maxWidth: 200 }} value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}>
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="in_progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+          <ViewToggle view={viewMode} onChange={setViewMode} />
+        </div>
         <span className="text-muted">{filtered.length} requests</span>
       </div>
 
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Room</th>
-              <th>Priority</th>
-              <th>Status</th>
-              <th>Assigned To</th>
-              <th>Notes</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map(req => {
-              const room = rooms.find(r => r.id === req.room_id);
-              const assignee = staff.find(s => s.id === req.assigned_to);
-              const priorityColor = req.priority === 'high' ? 'var(--error)' : req.priority === 'medium' ? 'var(--warning)' : 'var(--text-muted)';
-              return (
-                <tr key={req.id}>
-                  <td><strong>{room?.room_number || req.room_id?.slice(0, 8)}</strong></td>
-                  <td>
-                    <span className="priority-badge" style={{ background: priorityColor + '18', color: priorityColor }}>
-                      {req.priority}
-                    </span>
-                  </td>
-                  <td><StatusBadge status={req.status} /></td>
-                  <td>{assignee?.name || req.assigned_to?.slice(0, 8) || <span className="text-muted">Unassigned</span>}</td>
-                  <td className="text-muted">{req.notes || '-'}</td>
-                  <td className="text-muted">{formatDate(req.created_at)}</td>
-                  <td>
-                    <div className="table-actions">
-                      {req.status === 'pending' && (
-                        <button className="btn-icon" title="Assign" onClick={() => handleAssign(req)}>
-                          <i className="fas fa-user-check"></i>
+      {viewMode === 'table' ? (
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Room</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Assigned To</th>
+                <th>Notes</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map(req => {
+                const room = rooms.find(r => r.id === req.room_id);
+                const assignee = staff.find(s => s.id === req.assigned_to);
+                const priorityColor = req.priority === 'high' ? 'var(--error)' : req.priority === 'medium' ? 'var(--warning)' : 'var(--text-muted)';
+                return (
+                  <tr key={req.id} className="clickable-row" onClick={() => setSelectedRequest(req)}>
+                    <td><strong>{room?.room_number || req.room_id?.slice(0, 8)}</strong></td>
+                    <td>
+                      <span className="priority-badge" style={{ background: priorityColor + '18', color: priorityColor }}>
+                        {req.priority}
+                      </span>
+                    </td>
+                    <td><StatusBadge status={req.status} /></td>
+                    <td>{assignee?.name || req.assigned_to?.slice(0, 8) || <span className="text-muted">Unassigned</span>}</td>
+                    <td className="text-muted">{req.notes || '-'}</td>
+                    <td className="text-muted">{formatDate(req.created_at)}</td>
+                    <td>
+                      <div className="table-actions" onClick={e => e.stopPropagation()}>
+                        {req.status === 'pending' && (
+                          <button className="btn-icon" title="Assign" onClick={() => handleAssign(req)}>
+                            <i className="fas fa-user-check"></i>
+                          </button>
+                        )}
+                        {req.status === 'in_progress' && (
+                          <button className="btn-icon" style={{ color: 'var(--success)' }} title="Complete" onClick={() => handleComplete(req)}>
+                            <i className="fas fa-check"></i>
+                          </button>
+                        )}
+                        <button className="btn-icon btn-icon-danger" title="Delete" onClick={() => handleDelete(req)}>
+                          <i className="fas fa-trash"></i>
                         </button>
-                      )}
-                      {req.status === 'in_progress' && (
-                        <button className="btn-icon" style={{ color: 'var(--success)' }} title="Complete" onClick={() => handleComplete(req)}>
-                          <i className="fas fa-check"></i>
-                        </button>
-                      )}
-                      <button className="btn-icon btn-icon-danger" title="Delete" onClick={() => handleDelete(req)}>
-                        <i className="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-            {filtered.length === 0 && (
-              <tr><td colSpan="7" className="text-center text-muted py-3">No cleaning requests.</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+              {filtered.length === 0 && (
+                <tr><td colSpan="7" className="text-center text-muted py-3">No cleaning requests.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="card-grid">
+          {filtered.map(req => {
+            const room = rooms.find(r => r.id === req.room_id);
+            const assignee = staff.find(s => s.id === req.assigned_to);
+            const priorityColor = req.priority === 'high' ? 'var(--error)' : req.priority === 'medium' ? 'var(--warning)' : 'var(--text-muted)';
+            return (
+              <div key={req.id} className="card-grid-item" onClick={() => setSelectedRequest(req)}>
+                <div className="card-grid-head">
+                  <strong>{room?.room_number || req.room_id?.slice(0, 8)}</strong>
+                  <span className="priority-badge" style={{ background: priorityColor + '18', color: priorityColor }}>
+                    {req.priority}
+                  </span>
+                </div>
+                <div className="card-grid-body">
+                  <div><StatusBadge status={req.status} /></div>
+                  <div className="text-muted text-truncate" style={{ fontSize: '0.85rem' }}>
+                    {assignee?.name || req.assigned_to?.slice(0, 8) || 'Unassigned'}
+                  </div>
+                  <div className="text-wrap text-muted" style={{ fontSize: '0.85rem' }}>{req.notes || '-'}</div>
+                  <div className="text-muted" style={{ fontSize: '0.8rem' }}>{formatDate(req.created_at)}</div>
+                </div>
+                <div className="card-grid-actions" onClick={e => e.stopPropagation()}>
+                  {req.status === 'pending' && (
+                    <button className="btn btn-sm btn-outline" onClick={() => handleAssign(req)}>Assign</button>
+                  )}
+                  {req.status === 'in_progress' && (
+                    <button className="btn btn-sm btn-outline" style={{ color: 'var(--success)', borderColor: 'var(--success)' }} onClick={() => handleComplete(req)}>Complete</button>
+                  )}
+                  <button className="btn btn-sm btn-outline btn-outline-danger" onClick={() => handleDelete(req)}>Delete</button>
+                </div>
+              </div>
+            );
+          })}
+          {filtered.length === 0 && (
+            <div className="text-center text-muted py-3" style={{ gridColumn: '1/-1' }}>No cleaning requests.</div>
+          )}
+        </div>
+      )}
 
       {showForm && (
         <div className="modal-overlay" onClick={() => setShowForm(false)}>
@@ -216,7 +266,31 @@ export default function Housekeeping() {
         </div>
       )}
 
+      {selectedRequest && (
+        <DetailModal item={selectedRequest} title="Cleaning Request"
+          fields={[
+            { key: 'room_id', label: 'Room', render: (v, r) => roomMap[v]?.room_number || v?.slice(0, 8) },
+            { key: 'priority', label: 'Priority', render: v => <span className={`priority-${v}`}>{v}</span> },
+            { key: 'status', label: 'Status', render: v => <StatusBadge status={v} /> },
+            { key: 'assigned_to', label: 'Assigned To', render: (v, r) => staffMap[r?.assigned_to]?.name || v || '-' },
+            { key: 'notes', label: 'Notes', hide: v => !v },
+            { key: 'created_at', label: 'Created', render: v => formatDate(v) },
+          ]}
+          onClose={() => setSelectedRequest(null)} />
+      )}
+
       <style>{`
+        .clickable-row { cursor: pointer; transition: var(--transition); }
+        .clickable-row:hover { background: var(--bg); }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .card-grid-item {
+          background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg);
+          padding: 16px; cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; gap: 12px;
+        }
+        .card-grid-item:hover { box-shadow: var(--shadow-md); border-color: var(--primary); }
+        .card-grid-head { display: flex; justify-content: space-between; align-items: center; }
+        .card-grid-body { display: flex; flex-direction: column; gap: 4px; }
+        .card-grid-actions { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 8px; border-top: 1px solid var(--border); }
         .priority-badge {
           display: inline-block; padding: 2px 10px; border-radius: 100px;
           font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
@@ -243,6 +317,11 @@ export default function Housekeeping() {
         .modal-body { padding: 24px; }
         .modal-footer { display: flex; justify-content: flex-end; gap: 8px; padding: 16px 24px; border-top: 1px solid var(--border); }
         .py-3 { padding-top: 24px; padding-bottom: 24px; }
+        .text-truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 100%; }
+        .text-wrap { white-space: normal; word-break: break-word; overflow-wrap: break-word; }
+        .card-grid-item { overflow: hidden; }
+        .card-grid-body { min-width: 0; }
+        .card-grid-head strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
       `}</style>
     </div>
   );

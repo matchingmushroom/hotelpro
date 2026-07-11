@@ -196,31 +196,32 @@ export default function Reports() {
       <style>{`
         .stats-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 16px;
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          gap: 10px;
+          margin-bottom: 20px;
         }
         .stat-card {
           background: var(--bg-card);
-          border-radius: var(--radius-lg);
-          box-shadow: var(--shadow);
-          padding: 20px;
+          border-radius: var(--radius);
+          box-shadow: var(--shadow-sm);
+          padding: 12px 14px;
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 10px;
           border-top: 3px solid;
         }
         .stat-icon {
-          width: 48px; height: 48px;
-          border-radius: 12px;
+          width: 34px; height: 34px;
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 1.3rem;
+          font-size: 0.9rem;
           flex-shrink: 0;
         }
-        .stat-info { display: flex; flex-direction: column; }
-        .stat-value { font-size: 1.5rem; font-weight: 700; line-height: 1.2; }
-        .stat-label { font-size: 0.85rem; color: var(--text-muted); }
+        .stat-info { display: flex; flex-direction: column; flex: 1; min-width: 0; overflow: hidden; }
+        .stat-value { font-size: 1rem; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .stat-label { font-size: 0.68rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
         .mb-2 { margin-bottom: 12px; }
