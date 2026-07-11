@@ -4,14 +4,15 @@
 
 var DriveService = {
   FOLDERS: {
-    'id-cards': { id: null },
-    'payments': { id: null },
-    'rooms': { id: null }
+    'id-cards':    { id: null },
+    'payments':    { id: null },
+    'rooms':       { id: null },
+    'guest-docs':  { id: '17KJx9Q8N23gGjOkK_NfwoFSosMHyInsA' }
   },
 
   upload: function(params) {
     var fileName = params.fileName || 'untitled';
-    var fileData = params.fileData;  // base64 encoded
+    var fileData = params.fileData;
     var mimeType = params.mimeType || 'image/jpeg';
     var folder = params.folder || 'general';
 
@@ -50,6 +51,11 @@ var DriveService = {
   },
 
   _getFolderId: function(folderName) {
+    // Check static FOLDERS map first
+    var entry = this.FOLDERS[folderName];
+    if (entry && entry.id) return entry.id;
+
+    // Fall back to Script Properties cache
     var props = PropertiesService.getScriptProperties();
     var key = 'folder_' + folderName;
     var folderId = props.getProperty(key);

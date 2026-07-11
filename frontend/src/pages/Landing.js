@@ -1,6 +1,11 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { sendGeminiMessage } from '../config/gemini';
+import { fetchAll } from '../services/supabaseService';
+import { formatCurrency } from '../utils/formatters';
+import { AMENITIES } from '../utils/constants';
+
+const amenityIconMap = Object.fromEntries(AMENITIES.map(a => [a.value, a]));
 
 export default function Landing() {
   const [chatOpen, setChatOpen] = useState(false);
@@ -9,6 +14,24 @@ export default function Landing() {
     { role: 'ai', text: 'Welcome to Otel.Pro! How can I help you?' }
   ]);
   const [chatLoading, setChatLoading] = useState(false);
+  const [rooms, setRooms] = useState([]);
+  const [roomsLoading, setRoomsLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    loadRooms();
+  }, []);
+
+  async function loadRooms() {
+    try {
+      const { data } = await fetchAll('rooms', { filters: { status: 'available' }, orderBy: 'room_number' });
+      setRooms(data || []);
+    } catch (err) {
+      console.error('Failed to load rooms', err);
+    } finally {
+      setRoomsLoading(false);
+    }
+  }
 
   const handleChat = async () => {
     if (!chatMsg.trim()) return;
@@ -34,6 +57,7 @@ export default function Landing() {
             <a href="#amenities">Amenities</a>
             <a href="#contact">Contact</a>
             <Link to="/login" className="btn btn-accent btn-sm">Staff Login</Link>
+            <Link to="/register" className="btn btn-outline btn-sm" style={{color:'#fff',borderColor:'rgba(255,255,255,0.4)'}}>Register Hotel</Link>
           </div>
         </div>
       </nav>
@@ -50,21 +74,40 @@ export default function Landing() {
         <h2>Our Rooms</h2>
         <p className="section-subtitle">Choose from our selection of premium rooms</p>
         <div className="rooms-grid">
-          {[
-            { type: 'Single Room', price: 'NPR 2,500', img: '🛏️', desc: 'Cozy room for one guest with all essentials' },
-            { type: 'Double Room', price: 'NPR 4,000', img: '🛌', desc: 'Spacious room for two with queen bed' },
-            { type: 'Suite', price: 'NPR 8,000', img: '🏠', desc: 'Premium suite with living area and city view' },
-            { type: 'Deluxe', price: 'NPR 12,000', img: '🌟', desc: 'Top-floor luxury with panoramic views' },
-          ].map(room => (
-            <div key={room.type} className="room-card">
-              <div className="room-card-img">{room.img}</div>
+          {roomsLoading ? (
+            <div className="loading-placeholder">Loading rooms...</div>
+          ) : rooms.length === 0 ? (
+            <div className="loading-placeholder">No rooms available yet. Check back soon!</div>
+          ) : rooms.map(room => (
+            <div key={room.id} className="room-card">
+              <div className="room-card-img-wrap">
+                {room.images?.[0]
+                  ? <img className="room-card-img" src={room.images[0].startsWith('http') ? room.images[0] : `http://localhost:5000${room.images[0]}`} alt={room.room_number} />
+                  : <div className="room-card-img-placeholder"><i className="fas fa-hotel"></i></div>
+                }
+                <span className="room-card-badge">{room.room_type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+              </div>
               <div className="room-card-body">
-                <h3>{room.type}</h3>
-                <p>{room.desc}</p>
-                <div className="room-card-footer">
-                  <span className="room-price">{room.price}<small>/night</small></span>
-                  <button className="btn btn-primary btn-sm">Book Now</button>
+                <div className="room-card-header">
+                  <h3>{room.room_number}</h3>
+                  <span className="room-price">{formatCurrency(room.price_per_night)}<small>/night</small></span>
                 </div>
+                <div className="room-card-meta">
+                  <span><i className="fas fa-user-friends"></i> Up to {room.capacity} guests</span>
+                  <span><i className="fas fa-layer-group"></i> Floor {room.floor}</span>
+                </div>
+                <p>{room.description || 'Comfortable and well-equipped room for a pleasant stay.'}</p>
+                {room.amenities?.length > 0 && (
+                  <div className="landing-amenity-chips">
+                    {room.amenities.slice(0, 5).map(a => {
+                      const info = amenityIconMap[a];
+                      return <span key={a} className="chip"><i className={`fas ${info?.icon || 'fa-check'}`}></i> {info?.label || a}</span>;
+                    })}
+                  </div>
+                )}
+                <button className="btn btn-primary btn-block" onClick={() => navigate('/login')}>
+                  <i className="fas fa-calendar-check"></i> Book Now
+                </button>
               </div>
             </div>
           ))}
@@ -225,33 +268,99 @@ export default function Landing() {
         .section-subtitle { color: var(--text-muted); margin-bottom: 40px; }
         .rooms-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
           gap: 24px;
+        }
+        .loading-placeholder {
+          grid-column: 1 / -1;
+          padding: 60px;
+          color: var(--text-muted);
+          font-size: 1rem;
         }
         .room-card {
           background: var(--white);
           border-radius: 12px;
           overflow: hidden;
           box-shadow: var(--shadow);
+          transition: all 0.25s ease;
+          text-align: left;
+        }
+        .room-card:hover {
+          box-shadow: var(--shadow-lg);
+          transform: translateY(-3px);
+        }
+        .room-card-img-wrap {
+          position: relative;
+          height: 200px;
+          background: var(--bg);
+          overflow: hidden;
         }
         .room-card-img {
-          height: 160px;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        .room-card-img-placeholder {
+          width: 100%;
+          height: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 4rem;
-          background: var(--bg);
+          font-size: 3rem;
+          color: var(--text-muted);
         }
-        .room-card-body { padding: 20px; text-align: left; }
-        .room-card-body h3 { margin-bottom: 8px; }
-        .room-card-body p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px; }
-        .room-card-footer {
+        .room-card-badge {
+          position: absolute;
+          bottom: 12px;
+          left: 12px;
+          background: rgba(0,0,0,0.65);
+          backdrop-filter: blur(4px);
+          color: white;
+          padding: 4px 14px;
+          border-radius: 100px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        }
+        .room-card-body { padding: 20px; }
+        .room-card-body h3 { margin-bottom: 4px; font-size: 1.1rem; }
+        .room-card-body p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; }
+        .room-card-header {
           display: flex;
-          align-items: center;
           justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
         }
-        .room-price { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
-        .room-price small { font-size: 0.8rem; font-weight: 400; color: var(--text-muted); }
+        .room-card-meta {
+          display: flex;
+          gap: 16px;
+          font-size: 0.8rem;
+          color: var(--text-secondary);
+          margin-bottom: 10px;
+        }
+        .room-card-meta i { margin-right: 4px; }
+        .room-price { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+        .room-price small { font-size: 0.75rem; font-weight: 400; color: var(--text-muted); }
+        .landing-amenity-chips {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-bottom: 14px;
+        }
+        .landing-amenity-chips .chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 3px 10px;
+          border-radius: 100px;
+          font-size: 0.72rem;
+          font-weight: 500;
+          background: var(--bg);
+          color: var(--text-secondary);
+          border: 1px solid var(--border);
+        }
+        .landing-amenity-chips .chip i { color: var(--accent); font-size: 0.65rem; }
         .amenities-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));

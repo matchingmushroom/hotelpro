@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchAll, insertRecord } from '../../services/supabaseService';
+import { fetchAll, insertRecord, updateRecord } from '../../services/supabaseService';
 import { formatCurrency } from '../../utils/formatters';
 import { isValidDateRange } from '../../utils/validators';
 

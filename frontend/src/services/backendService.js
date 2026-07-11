@@ -68,4 +68,11 @@ export async function resetStaffPassword(id, password) {
   });
 }
 
+export async function registerHotel(data) {
+  return request('/api/hotel/register', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
 

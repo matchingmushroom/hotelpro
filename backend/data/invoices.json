@@ -1,0 +1,318 @@
+{
+  "table": "invoices",
+  "rows": [
+    {
+      "id": "00000000-0000-0000-0000-000000000070",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "guest_id": "00000000-0000-0000-0000-000000000010",
+      "booking_id": null,
+      "quote_id": null,
+      "guest_name": "Ram Sharma",
+      "guest_email": "ram@email.com",
+      "items": [
+        {
+          "total": 7500,
+          "quantity": 1,
+          "unit_price": 7500,
+          "description": "Single Room 102 - 3 nights"
+        }
+      ],
+      "subtotal": 7500,
+      "tax": 750,
+      "total": 8250,
+      "amount_paid": 0,
+      "balance": 8250,
+      "status": "draft",
+      "due_date": null,
+      "notes": null,
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000071",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "guest_id": "00000000-0000-0000-0000-000000000014",
+      "booking_id": null,
+      "quote_id": null,
+      "guest_name": "Binod Rai",
+      "guest_email": "binod@email.com",
+      "items": [
+        {
+          "total": 24000,
+          "quantity": 1,
+          "unit_price": 24000,
+          "description": "Premium Double 205 - 5 nights"
+        }
+      ],
+      "subtotal": 24000,
+      "tax": 2400,
+      "total": 26400,
+      "amount_paid": 10000,
+      "balance": 16400,
+      "status": "partial",
+      "due_date": null,
+      "notes": null,
+      "created_at": "2026-07-10T00:00:00+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000072",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "guest_id": "00000000-0000-0000-0000-000000000026",
+      "booking_id": null,
+      "quote_id": null,
+      "guest_name": "Sarah Lee",
+      "guest_email": "sarah@email.com",
+      "items": [
+        {
+          "total": 5000,
+          "quantity": 1,
+          "unit_price": 5000,
+          "description": "Single Room 101 - 2 nights"
+        }
+      ],
+      "subtotal": 5000,
+      "tax": 500,
+      "total": 5500,
+      "amount_paid": 5500,
+      "balance": 0,
+      "status": "paid",
+      "due_date": null,
+      "notes": null,
+      "created_at": "2026-07-04T00:00:00+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000073",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "guest_id": "00000000-0000-0000-0000-000000000027",
+      "booking_id": null,
+      "quote_id": null,
+      "guest_name": "Hari Bhandari",
+      "guest_email": "hari@email.com",
+      "items": [
+        {
+          "total": 12600,
+          "quantity": 1,
+          "unit_price": 12600,
+          "description": "Double Room 203 - 3 nights"
+        }
+      ],
+      "subtotal": 12600,
+      "tax": 1260,
+      "total": 13860,
+      "amount_paid": 13860,
+      "balance": 0,
+      "status": "paid",
+      "due_date": null,
+      "notes": null,
+      "created_at": "2026-07-06T00:00:00+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000074",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "guest_id": "00000000-0000-0000-0000-000000000028",
+      "booking_id": null,
+      "quote_id": null,
+      "guest_name": "Nina Joshi",
+      "guest_email": "nina@email.com",
+      "items": [
+        {
+          "total": 16500,
+          "quantity": 1,
+          "unit_price": 16500,
+          "description": "Twin Room 303 - 3 nights"
+        }
+      ],
+      "subtotal": 16500,
+      "tax": 1650,
+      "total": 18150,
+      "amount_paid": 18150,
+      "balance": 0,
+      "status": "paid",
+      "due_date": null,
+      "notes": null,
+      "created_at": "2026-07-04T00:00:00+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000075",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "guest_id": "00000000-0000-0000-0000-000000000029",
+      "booking_id": null,
+      "quote_id": null,
+      "guest_name": "Alex Turner",
+      "guest_email": "alex@email.com",
+      "items": [
+        {
+          "total": 25500,
+          "quantity": 1,
+          "unit_price": 25500,
+          "description": "Suite 403 - 3 nights"
+        }
+      ],
+      "subtotal": 25500,
+      "tax": 2550,
+      "total": 28050,
+      "amount_paid": 0,
+      "balance": 28050,
+      "status": "sent",
+      "due_date": null,
+      "notes": null,
+      "created_at": "2026-06-30T00:00:00+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000076",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "guest_id": "00000000-0000-0000-0000-000000000010",
+      "booking_id": null,
+      "quote_id": null,
+      "guest_name": "Ram Sharma",
+      "guest_email": "ram@email.com",
+      "items": [
+        {
+          "total": 10000,
+          "quantity": 1,
+          "unit_price": 10000,
+          "description": "Twin Room 301 - 2 nights"
+        }
+      ],
+      "subtotal": 10000,
+      "tax": 1000,
+      "total": 11000,
+      "amount_paid": 11000,
+      "balance": 0,
+      "status": "paid",
+      "due_date": null,
+      "notes": null,
+      "created_at": "2026-06-28T00:00:00+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000077",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "guest_id": "00000000-0000-0000-0000-000000000011",
+      "booking_id": null,
+      "quote_id": null,
+      "guest_name": "Sita Poudel",
+      "guest_email": "sita@email.com",
+      "items": [
+        {
+          "total": 36000,
+          "quantity": 1,
+          "unit_price": 36000,
+          "description": "Deluxe 501 - 3 nights"
+        }
+      ],
+      "subtotal": 36000,
+      "tax": 3600,
+      "total": 39600,
+      "amount_paid": 39600,
+      "balance": 0,
+      "status": "paid",
+      "due_date": null,
+      "notes": null,
+      "created_at": "2026-07-02T00:00:00+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000078",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "guest_id": "00000000-0000-0000-0000-000000000012",
+      "booking_id": null,
+      "quote_id": null,
+      "guest_name": "John Doe",
+      "guest_email": "john@email.com",
+      "items": [
+        {
+          "total": 24000,
+          "quantity": 1,
+          "unit_price": 24000,
+          "description": "Suite 401 - 3 nights"
+        }
+      ],
+      "subtotal": 24000,
+      "tax": 2400,
+      "total": 26400,
+      "amount_paid": 26400,
+      "balance": 0,
+      "status": "paid",
+      "due_date": null,
+      "notes": null,
+      "created_at": "2026-06-29T00:00:00+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000079",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "guest_id": "00000000-0000-0000-0000-000000000019",
+      "booking_id": null,
+      "quote_id": null,
+      "guest_name": "Sunita Lama",
+      "guest_email": "sunita@email.com",
+      "items": [
+        {
+          "total": 45000,
+          "quantity": 1,
+          "unit_price": 45000,
+          "description": "Presidential Suite 502 - 3 nights"
+        }
+      ],
+      "subtotal": 45000,
+      "tax": 4500,
+      "total": 49500,
+      "amount_paid": 0,
+      "balance": 49500,
+      "status": "draft",
+      "due_date": null,
+      "notes": null,
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000080",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "guest_id": "00000000-0000-0000-0000-000000000021",
+      "booking_id": null,
+      "quote_id": null,
+      "guest_name": "Emily Clark",
+      "guest_email": "emily@email.com",
+      "items": [
+        {
+          "total": 80000,
+          "quantity": 1,
+          "unit_price": 80000,
+          "description": "Penthouse 504 - 4 nights"
+        }
+      ],
+      "subtotal": 80000,
+      "tax": 8000,
+      "total": 88000,
+      "amount_paid": 88000,
+      "balance": 0,
+      "status": "paid",
+      "due_date": null,
+      "notes": null,
+      "created_at": "2026-06-20T00:00:00+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000081",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "guest_id": "00000000-0000-0000-0000-000000000013",
+      "booking_id": null,
+      "quote_id": null,
+      "guest_name": "Jane Smith",
+      "guest_email": "jane@email.com",
+      "items": [
+        {
+          "total": 9000,
+          "quantity": 1,
+          "unit_price": 9000,
+          "description": "Double Room 202 - 2 nights"
+        }
+      ],
+      "subtotal": 9000,
+      "tax": 900,
+      "total": 9900,
+      "amount_paid": 0,
+      "balance": 9900,
+      "status": "overdue",
+      "due_date": null,
+      "notes": null,
+      "created_at": "2026-06-25T00:00:00+00:00"
+    }
+  ],
+  "updatedAt": "2026-07-11T10:56:42.276Z"
+}

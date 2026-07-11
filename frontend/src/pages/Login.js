@@ -61,8 +61,11 @@ export default function Login() {
             {submitting ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-        <div className="auth-footer">
+        <div className="auth-links">
           <Link to="/forgot-password">Forgot password?</Link>
+        </div>
+        <div className="auth-footer">
+          New hotel? <Link to="/register">Register your hotel</Link>
         </div>
       </div>
       <style>{`
@@ -105,15 +108,24 @@ export default function Login() {
           justify-content: center;
           margin-top: 8px;
         }
-        .auth-footer {
+        .auth-links {
           text-align: center;
           margin-top: 20px;
         }
-        .auth-footer a {
+        .auth-links a {
           font-size: 0.85rem;
           color: var(--text-muted);
         }
-        .auth-footer a:hover { color: var(--primary); }
+        .auth-links a:hover { color: var(--primary); }
+        .auth-footer {
+          text-align: center;
+          margin-top: 16px;
+          padding-top: 16px;
+          border-top: 1px solid var(--border-light);
+          font-size: 0.85rem;
+          color: var(--text-secondary);
+        }
+        .auth-footer a { font-weight: 600; }
       `}</style>
     </div>
   );

@@ -1,0 +1,491 @@
+{
+  "table": "rooms",
+  "rows": [
+    {
+      "id": "00000000-0000-0000-0000-000000000101",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "101",
+      "room_type": "single",
+      "floor": 1,
+      "price_per_night": 2500,
+      "capacity": 1,
+      "status": "cleaning",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac"
+      ],
+      "description": "Cozy single room with city view",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000104",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "104",
+      "room_type": "single",
+      "floor": 1,
+      "price_per_night": 2200,
+      "capacity": 1,
+      "status": "occupied",
+      "amenities": [
+        "wifi",
+        "tv"
+      ],
+      "description": "Budget-friendly single room",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000102",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "102",
+      "room_type": "single",
+      "floor": 1,
+      "price_per_night": 2500,
+      "capacity": 1,
+      "status": "occupied",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac"
+      ],
+      "description": "Standard single room",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000105",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "105",
+      "room_type": "single",
+      "floor": 1,
+      "price_per_night": 2500,
+      "capacity": 1,
+      "status": "available",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac"
+      ],
+      "description": "Standard single room",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000201",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "201",
+      "room_type": "double",
+      "floor": 2,
+      "price_per_night": 4000,
+      "capacity": 2,
+      "status": "occupied",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar"
+      ],
+      "description": "Spacious double room with queen bed",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000202",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "202",
+      "room_type": "double",
+      "floor": 2,
+      "price_per_night": 4500,
+      "capacity": 2,
+      "status": "occupied",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar",
+        "balcony"
+      ],
+      "description": "Double room with private balcony",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000203",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "203",
+      "room_type": "double",
+      "floor": 2,
+      "price_per_night": 4200,
+      "capacity": 2,
+      "status": "available",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar"
+      ],
+      "description": "Double room city view",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000205",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "205",
+      "room_type": "double",
+      "floor": 2,
+      "price_per_night": 4800,
+      "capacity": 2,
+      "status": "occupied",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar",
+        "balcony",
+        "bathtub"
+      ],
+      "description": "Premium double room",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000301",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "301",
+      "room_type": "twin",
+      "floor": 3,
+      "price_per_night": 5000,
+      "capacity": 2,
+      "status": "available",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar"
+      ],
+      "description": "Twin room with two single beds",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000302",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "302",
+      "room_type": "twin",
+      "floor": 3,
+      "price_per_night": 5000,
+      "capacity": 2,
+      "status": "occupied",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar"
+      ],
+      "description": "Twin room with garden view",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000303",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "303",
+      "room_type": "twin",
+      "floor": 3,
+      "price_per_night": 5500,
+      "capacity": 2,
+      "status": "available",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar",
+        "balcony"
+      ],
+      "description": "Twin room with mountain view",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000304",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "304",
+      "room_type": "twin",
+      "floor": 3,
+      "price_per_night": 5200,
+      "capacity": 2,
+      "status": "occupied",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar"
+      ],
+      "description": "Twin deluxe",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000305",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "305",
+      "room_type": "twin",
+      "floor": 3,
+      "price_per_night": 5000,
+      "capacity": 2,
+      "status": "occupied",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar"
+      ],
+      "description": "Standard twin room",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000401",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "401",
+      "room_type": "suite",
+      "floor": 4,
+      "price_per_night": 8000,
+      "capacity": 3,
+      "status": "occupied",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar",
+        "living_area",
+        "bathtub"
+      ],
+      "description": "Premium suite with living room",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000402",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "402",
+      "room_type": "suite",
+      "floor": 4,
+      "price_per_night": 9000,
+      "capacity": 3,
+      "status": "occupied",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar",
+        "living_area",
+        "bathtub",
+        "balcony"
+      ],
+      "description": "Executive suite with panoramic view",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000403",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "403",
+      "room_type": "suite",
+      "floor": 4,
+      "price_per_night": 8500,
+      "capacity": 3,
+      "status": "available",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar",
+        "living_area",
+        "bathtub"
+      ],
+      "description": "Junior suite",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000404",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "404",
+      "room_type": "suite",
+      "floor": 4,
+      "price_per_night": 9500,
+      "capacity": 4,
+      "status": "available",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar",
+        "living_area",
+        "bathtub",
+        "balcony",
+        "kitchenette"
+      ],
+      "description": "Family suite",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000405",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "405",
+      "room_type": "suite",
+      "floor": 4,
+      "price_per_night": 10000,
+      "capacity": 4,
+      "status": "maintenance",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar",
+        "living_area",
+        "bathtub",
+        "balcony"
+      ],
+      "description": "Suite under renovation",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000501",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "501",
+      "room_type": "deluxe",
+      "floor": 5,
+      "price_per_night": 12000,
+      "capacity": 4,
+      "status": "available",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar",
+        "living_area",
+        "bathtub",
+        "balcony",
+        "kitchenette"
+      ],
+      "description": "Top-floor deluxe apartment",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000502",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "502",
+      "room_type": "deluxe",
+      "floor": 5,
+      "price_per_night": 15000,
+      "capacity": 4,
+      "status": "occupied",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar",
+        "living_area",
+        "bathtub",
+        "balcony",
+        "kitchenette"
+      ],
+      "description": "Presidential suite",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000503",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "503",
+      "room_type": "deluxe",
+      "floor": 5,
+      "price_per_night": 13000,
+      "capacity": 3,
+      "status": "available",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar",
+        "living_area",
+        "bathtub",
+        "balcony"
+      ],
+      "description": "Deluxe corner suite",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000504",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "504",
+      "room_type": "deluxe",
+      "floor": 5,
+      "price_per_night": 20000,
+      "capacity": 6,
+      "status": "available",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar",
+        "living_area",
+        "bathtub",
+        "balcony",
+        "kitchenette",
+        "dining"
+      ],
+      "description": "Penthouse",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000204",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "204",
+      "room_type": "double",
+      "floor": 2,
+      "price_per_night": 4000,
+      "capacity": 2,
+      "status": "occupied",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "minibar"
+      ],
+      "description": "Double room with street view",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000103",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "room_number": "103",
+      "room_type": "single",
+      "floor": 1,
+      "price_per_night": 2800,
+      "capacity": 1,
+      "status": "cleaning",
+      "amenities": [
+        "wifi",
+        "tv",
+        "ac",
+        "balcony"
+      ],
+      "description": "Single room with garden access",
+      "images": [],
+      "created_at": "2026-07-10T14:12:33.446969+00:00"
+    }
+  ],
+  "updatedAt": "2026-07-11T10:56:42.276Z"
+}

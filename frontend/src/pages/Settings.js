@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchAll, insertRecord, updateRecord, removeRecord } from '../services/supabaseService';
+import { fetchAll, insertRecord, updateRecord, removeRecord, fetchById } from '../services/supabaseService';
 import { supabase } from '../config/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { inviteStaff, updateStaff, deleteStaff, resetStaffPassword } from '../services/backendService';
@@ -30,17 +30,24 @@ export default function Settings() {
   const [passwordTarget, setPasswordTarget] = useState(null);
   const [newPassword, setNewPassword] = useState('');
   const [ownPasswordForm, setOwnPasswordForm] = useState({ current: '', new: '', confirm: '' });
+  const [hotel, setHotel] = useState(null);
+  const [hotelForm, setHotelForm] = useState({ name: '', email: '', phone: '', address: '', currency: '' });
 
   useEffect(() => { loadData(); }, []);
 
   async function loadData() {
     try {
-      const [pmRes, staffRes] = await Promise.all([
+      const [pmRes, staffRes, hotelData] = await Promise.all([
         fetchAll('payment_methods', { orderBy: 'name' }),
         fetchAll('profiles', { orderBy: 'name' }),
+        profile?.hotel_id ? fetchById('hotels', profile.hotel_id) : Promise.resolve(null),
       ]);
       setPaymentMethods(pmRes.data || []);
       setStaff(staffRes.data || []);
+      if (hotelData) {
+        setHotel(hotelData);
+        setHotelForm({ name: hotelData.name || '', email: hotelData.email || '', phone: hotelData.phone || '', address: hotelData.address || '', currency: hotelData.currency || 'NPR' });
+      }
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   }
@@ -62,6 +69,21 @@ export default function Settings() {
   async function handleTogglePm(pm) {
     try { await updateRecord('payment_methods', pm.id, { active: !pm.active }); loadData(); }
     catch (err) { showError('Error', err.message); }
+  }
+
+  async function handleSaveHotel(e) {
+    e.preventDefault();
+    if (!hotel) return;
+    setSubmitting(true);
+    try {
+      await updateRecord('hotels', hotel.id, hotelForm);
+      setHotel({ ...hotel, ...hotelForm });
+      showSuccess('Saved', 'Hotel profile updated');
+    } catch (err) {
+      showError('Error', err.message);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   async function handleDeletePm(pm) {
@@ -266,7 +288,51 @@ export default function Settings() {
       )}
 
       {activeTab === 'hotel' && (
-        <div className="card"><h3 className="mb-2">Hotel Profile</h3><p className="text-muted">Hotel profile settings will be available in a future update.</p></div>
+        <div className="card" style={{maxWidth:560}}>
+          <h3 className="mb-2">Hotel Profile</h3>
+          {hotel ? (
+            <form onSubmit={handleSaveHotel}>
+              <div className="form-group">
+                <label>Hotel Name</label>
+                <input className="form-control" value={hotelForm.name}
+                  onChange={e => setHotelForm(p => ({...p, name: e.target.value}))} required />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Email</label>
+                  <input className="form-control" type="email" value={hotelForm.email}
+                    onChange={e => setHotelForm(p => ({...p, email: e.target.value}))} />
+                </div>
+                <div className="form-group">
+                  <label>Phone</label>
+                  <input className="form-control" value={hotelForm.phone}
+                    onChange={e => setHotelForm(p => ({...p, phone: e.target.value}))} />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Address</label>
+                <input className="form-control" value={hotelForm.address}
+                  onChange={e => setHotelForm(p => ({...p, address: e.target.value}))} />
+              </div>
+              <div className="form-group">
+                <label>Currency</label>
+                <select className="form-control" value={hotelForm.currency}
+                  onChange={e => setHotelForm(p => ({...p, currency: e.target.value}))}>
+                  <option value="NPR">NPR - Nepalese Rupee</option>
+                  <option value="USD">USD - US Dollar</option>
+                  <option value="EUR">EUR - Euro</option>
+                  <option value="GBP">GBP - British Pound</option>
+                  <option value="INR">INR - Indian Rupee</option>
+                </select>
+              </div>
+              <button type="submit" className="btn btn-primary" disabled={submitting}>
+                {submitting ? 'Saving...' : 'Save Changes'}
+              </button>
+            </form>
+          ) : (
+            <p className="text-muted">Loading hotel info...</p>
+          )}
+        </div>
       )}
 
       {/* Payment Method Modal */}

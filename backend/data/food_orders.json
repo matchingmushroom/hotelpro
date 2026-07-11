@@ -1,0 +1,804 @@
+{
+  "table": "food_orders",
+  "rows": [
+    {
+      "id": "24ee9e5a-ea96-4483-871d-32fb975f0cdc",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000030",
+      "room_number": "102",
+      "guest_name": "Ram Sharma",
+      "items": [
+        {
+          "total": 800,
+          "quantity": 2,
+          "unit_price": 400,
+          "description": "Dal Bhat"
+        },
+        {
+          "total": 100,
+          "quantity": 1,
+          "unit_price": 100,
+          "description": "Nepali Tea"
+        }
+      ],
+      "total_amount": 900,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-08T00:00:00+00:00"
+    },
+    {
+      "id": "5551eb6a-a1eb-49f2-a022-a0001786e95a",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000030",
+      "room_number": "102",
+      "guest_name": "Ram Sharma",
+      "items": [
+        {
+          "total": 550,
+          "quantity": 1,
+          "unit_price": 550,
+          "description": "Chicken Biryani"
+        },
+        {
+          "total": 300,
+          "quantity": 2,
+          "unit_price": 150,
+          "description": "Gulab Jamun"
+        }
+      ],
+      "total_amount": 850,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "id": "4a50372a-382c-4dd5-ab55-75f5554d578a",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000031",
+      "room_number": "103",
+      "guest_name": "Sita Poudel",
+      "items": [
+        {
+          "total": 350,
+          "quantity": 1,
+          "unit_price": 350,
+          "description": "Vegetable Curry"
+        },
+        {
+          "total": 200,
+          "quantity": 1,
+          "unit_price": 200,
+          "description": "Fresh Juice"
+        },
+        {
+          "total": 180,
+          "quantity": 1,
+          "unit_price": 180,
+          "description": "French Fries"
+        }
+      ],
+      "total_amount": 730,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "id": "26d1fe50-388b-4034-8769-3c47a9e43782",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000032",
+      "room_number": "201",
+      "guest_name": "John Doe",
+      "items": [
+        {
+          "total": 1300,
+          "quantity": 2,
+          "unit_price": 650,
+          "description": "Mutton Sekuwa"
+        },
+        {
+          "total": 200,
+          "quantity": 2,
+          "unit_price": 100,
+          "description": "Nepali Tea"
+        }
+      ],
+      "total_amount": 1500,
+      "status": "preparing",
+      "notes": null,
+      "created_at": "2026-07-10T00:00:00+00:00"
+    },
+    {
+      "id": "3c0df67f-04b1-445b-8e39-1bb819c53670",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000032",
+      "room_number": "201",
+      "guest_name": "John Doe",
+      "items": [
+        {
+          "total": 360,
+          "quantity": 2,
+          "unit_price": 180,
+          "description": "French Fries"
+        },
+        {
+          "total": 400,
+          "quantity": 2,
+          "unit_price": 200,
+          "description": "Fresh Juice"
+        }
+      ],
+      "total_amount": 760,
+      "status": "pending",
+      "notes": null,
+      "created_at": "2026-07-10T00:00:00+00:00"
+    },
+    {
+      "id": "3d02a830-5eb7-452d-b43f-4bb95e21a541",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000033",
+      "room_number": "202",
+      "guest_name": "Jane Smith",
+      "items": [
+        {
+          "total": 400,
+          "quantity": 1,
+          "unit_price": 400,
+          "description": "Dal Bhat"
+        },
+        {
+          "total": 550,
+          "quantity": 1,
+          "unit_price": 550,
+          "description": "Chicken Biryani"
+        }
+      ],
+      "total_amount": 950,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "id": "bdeabc49-7f6e-4a63-bed8-c76bf40753b8",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000034",
+      "room_number": "205",
+      "guest_name": "Binod Rai",
+      "items": [
+        {
+          "total": 450,
+          "quantity": 3,
+          "unit_price": 150,
+          "description": "Gulab Jamun"
+        },
+        {
+          "total": 200,
+          "quantity": 2,
+          "unit_price": 100,
+          "description": "Nepali Tea"
+        }
+      ],
+      "total_amount": 650,
+      "status": "preparing",
+      "notes": null,
+      "created_at": "2026-07-10T00:00:00+00:00"
+    },
+    {
+      "id": "4cd25862-829d-4716-93bd-c2bd94079abd",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000035",
+      "room_number": "302",
+      "guest_name": "Gita Gurung",
+      "items": [
+        {
+          "total": 1300,
+          "quantity": 2,
+          "unit_price": 650,
+          "description": "Mutton Sekuwa"
+        },
+        {
+          "total": 800,
+          "quantity": 2,
+          "unit_price": 400,
+          "description": "Dal Bhat"
+        },
+        {
+          "total": 400,
+          "quantity": 2,
+          "unit_price": 200,
+          "description": "Fresh Juice"
+        }
+      ],
+      "total_amount": 2500,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-08T00:00:00+00:00"
+    },
+    {
+      "id": "d971e36d-5ee2-47fe-b986-67d2fa083cfc",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000037",
+      "room_number": "305",
+      "guest_name": "Anita Thapa",
+      "items": [
+        {
+          "total": 1100,
+          "quantity": 2,
+          "unit_price": 550,
+          "description": "Chicken Biryani"
+        },
+        {
+          "total": 600,
+          "quantity": 4,
+          "unit_price": 150,
+          "description": "Gulab Jamun"
+        }
+      ],
+      "total_amount": 1700,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "id": "0c66d8c0-1e31-4bc9-a5c3-836c34fb92f8",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000038",
+      "room_number": "401",
+      "guest_name": "David Brown",
+      "items": [
+        {
+          "total": 350,
+          "quantity": 1,
+          "unit_price": 350,
+          "description": "Vegetable Curry"
+        },
+        {
+          "total": 180,
+          "quantity": 1,
+          "unit_price": 180,
+          "description": "French Fries"
+        }
+      ],
+      "total_amount": 530,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "id": "438ead9a-06ee-4adf-87e8-0155f08aefa4",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000039",
+      "room_number": "502",
+      "guest_name": "Sunita Lama",
+      "items": [
+        {
+          "total": 1200,
+          "quantity": 3,
+          "unit_price": 400,
+          "description": "Dal Bhat"
+        },
+        {
+          "total": 1300,
+          "quantity": 2,
+          "unit_price": 650,
+          "description": "Mutton Sekuwa"
+        },
+        {
+          "total": 600,
+          "quantity": 3,
+          "unit_price": 200,
+          "description": "Fresh Juice"
+        }
+      ],
+      "total_amount": 3100,
+      "status": "pending",
+      "notes": null,
+      "created_at": "2026-07-10T00:00:00+00:00"
+    },
+    {
+      "id": "a62d1e49-d8dc-4384-98cc-6bba43de6c95",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000046",
+      "room_number": "101",
+      "guest_name": "Sarah Lee",
+      "items": [
+        {
+          "total": 550,
+          "quantity": 1,
+          "unit_price": 550,
+          "description": "Chicken Biryani"
+        }
+      ],
+      "total_amount": 550,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-05T00:00:00+00:00"
+    },
+    {
+      "id": "272e40ce-f3a9-480c-89fc-9baee7884725",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000048",
+      "room_number": "303",
+      "guest_name": "Nina Joshi",
+      "items": [
+        {
+          "total": 200,
+          "quantity": 2,
+          "unit_price": 100,
+          "description": "Nepali Tea"
+        },
+        {
+          "total": 300,
+          "quantity": 2,
+          "unit_price": 150,
+          "description": "Gulab Jamun"
+        }
+      ],
+      "total_amount": 500,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-04T00:00:00+00:00"
+    },
+    {
+      "id": "c848dcdf-3d01-4a45-8c0b-33cab4794900",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000045",
+      "room_number": null,
+      "guest_name": "Prakash Adhikari",
+      "items": [
+        {
+          "total": 720,
+          "quantity": 4,
+          "unit_price": 180,
+          "description": "French Fries"
+        },
+        {
+          "total": 800,
+          "quantity": 4,
+          "unit_price": 200,
+          "description": "Fresh Juice"
+        }
+      ],
+      "total_amount": 1520,
+      "status": "cancelled",
+      "notes": null,
+      "created_at": "2026-07-07T00:00:00+00:00"
+    },
+    {
+      "id": "5ada4a3a-e080-4fec-aefc-b8b71d73786b",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000061",
+      "room_number": "504",
+      "guest_name": "Emily Clark",
+      "items": [
+        {
+          "total": 2200,
+          "quantity": 4,
+          "unit_price": 550,
+          "description": "Chicken Biryani"
+        },
+        {
+          "total": 1950,
+          "quantity": 3,
+          "unit_price": 650,
+          "description": "Mutton Sekuwa"
+        },
+        {
+          "total": 900,
+          "quantity": 6,
+          "unit_price": 150,
+          "description": "Gulab Jamun"
+        },
+        {
+          "total": 800,
+          "quantity": 4,
+          "unit_price": 200,
+          "description": "Fresh Juice"
+        }
+      ],
+      "total_amount": 5850,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-06-21T00:00:00+00:00"
+    },
+    {
+      "id": "d62281c5-31fd-44e2-b5ff-7efdaf1e360b",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000030",
+      "room_number": "102",
+      "guest_name": "Ram Sharma",
+      "items": [
+        {
+          "total": 800,
+          "quantity": 2,
+          "unit_price": 400,
+          "description": "Dal Bhat"
+        },
+        {
+          "total": 100,
+          "quantity": 1,
+          "unit_price": 100,
+          "description": "Nepali Tea"
+        }
+      ],
+      "total_amount": 900,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-08T00:00:00+00:00"
+    },
+    {
+      "id": "9e485767-efc0-4ffe-b57e-a65e85e1efb9",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000030",
+      "room_number": "102",
+      "guest_name": "Ram Sharma",
+      "items": [
+        {
+          "total": 550,
+          "quantity": 1,
+          "unit_price": 550,
+          "description": "Chicken Biryani"
+        },
+        {
+          "total": 300,
+          "quantity": 2,
+          "unit_price": 150,
+          "description": "Gulab Jamun"
+        }
+      ],
+      "total_amount": 850,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "id": "73edcaa0-b9ac-49d8-aae9-10449da3423a",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000031",
+      "room_number": "103",
+      "guest_name": "Sita Poudel",
+      "items": [
+        {
+          "total": 350,
+          "quantity": 1,
+          "unit_price": 350,
+          "description": "Vegetable Curry"
+        },
+        {
+          "total": 200,
+          "quantity": 1,
+          "unit_price": 200,
+          "description": "Fresh Juice"
+        },
+        {
+          "total": 180,
+          "quantity": 1,
+          "unit_price": 180,
+          "description": "French Fries"
+        }
+      ],
+      "total_amount": 730,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "id": "e44b659f-8a06-484c-af9f-f719db9bd4b0",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000032",
+      "room_number": "201",
+      "guest_name": "John Doe",
+      "items": [
+        {
+          "total": 1300,
+          "quantity": 2,
+          "unit_price": 650,
+          "description": "Mutton Sekuwa"
+        },
+        {
+          "total": 200,
+          "quantity": 2,
+          "unit_price": 100,
+          "description": "Nepali Tea"
+        }
+      ],
+      "total_amount": 1500,
+      "status": "preparing",
+      "notes": null,
+      "created_at": "2026-07-10T00:00:00+00:00"
+    },
+    {
+      "id": "52359db4-b1f2-4ad6-b671-87f85f3360b1",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000032",
+      "room_number": "201",
+      "guest_name": "John Doe",
+      "items": [
+        {
+          "total": 360,
+          "quantity": 2,
+          "unit_price": 180,
+          "description": "French Fries"
+        },
+        {
+          "total": 400,
+          "quantity": 2,
+          "unit_price": 200,
+          "description": "Fresh Juice"
+        }
+      ],
+      "total_amount": 760,
+      "status": "pending",
+      "notes": null,
+      "created_at": "2026-07-10T00:00:00+00:00"
+    },
+    {
+      "id": "dce2ea97-4f57-4217-80c5-a4f2cddc4b43",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000033",
+      "room_number": "202",
+      "guest_name": "Jane Smith",
+      "items": [
+        {
+          "total": 400,
+          "quantity": 1,
+          "unit_price": 400,
+          "description": "Dal Bhat"
+        },
+        {
+          "total": 550,
+          "quantity": 1,
+          "unit_price": 550,
+          "description": "Chicken Biryani"
+        }
+      ],
+      "total_amount": 950,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "id": "9194d824-45ad-4b82-a98e-6146b8f082f5",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000034",
+      "room_number": "205",
+      "guest_name": "Binod Rai",
+      "items": [
+        {
+          "total": 450,
+          "quantity": 3,
+          "unit_price": 150,
+          "description": "Gulab Jamun"
+        },
+        {
+          "total": 200,
+          "quantity": 2,
+          "unit_price": 100,
+          "description": "Nepali Tea"
+        }
+      ],
+      "total_amount": 650,
+      "status": "preparing",
+      "notes": null,
+      "created_at": "2026-07-10T00:00:00+00:00"
+    },
+    {
+      "id": "87201d51-ce63-496f-8116-1fa678a5380a",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000035",
+      "room_number": "302",
+      "guest_name": "Gita Gurung",
+      "items": [
+        {
+          "total": 1300,
+          "quantity": 2,
+          "unit_price": 650,
+          "description": "Mutton Sekuwa"
+        },
+        {
+          "total": 800,
+          "quantity": 2,
+          "unit_price": 400,
+          "description": "Dal Bhat"
+        },
+        {
+          "total": 400,
+          "quantity": 2,
+          "unit_price": 200,
+          "description": "Fresh Juice"
+        }
+      ],
+      "total_amount": 2500,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-08T00:00:00+00:00"
+    },
+    {
+      "id": "6fbb756e-c3f5-4be5-b53d-aea1f3a7a438",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000037",
+      "room_number": "305",
+      "guest_name": "Anita Thapa",
+      "items": [
+        {
+          "total": 1100,
+          "quantity": 2,
+          "unit_price": 550,
+          "description": "Chicken Biryani"
+        },
+        {
+          "total": 600,
+          "quantity": 4,
+          "unit_price": 150,
+          "description": "Gulab Jamun"
+        }
+      ],
+      "total_amount": 1700,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "id": "522db0d8-f153-442a-92e1-3b24efc0712d",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000038",
+      "room_number": "401",
+      "guest_name": "David Brown",
+      "items": [
+        {
+          "total": 350,
+          "quantity": 1,
+          "unit_price": 350,
+          "description": "Vegetable Curry"
+        },
+        {
+          "total": 180,
+          "quantity": 1,
+          "unit_price": 180,
+          "description": "French Fries"
+        }
+      ],
+      "total_amount": 530,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-09T00:00:00+00:00"
+    },
+    {
+      "id": "f4f2d330-b31c-43fb-a007-84037fddd72e",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000039",
+      "room_number": "502",
+      "guest_name": "Sunita Lama",
+      "items": [
+        {
+          "total": 1200,
+          "quantity": 3,
+          "unit_price": 400,
+          "description": "Dal Bhat"
+        },
+        {
+          "total": 1300,
+          "quantity": 2,
+          "unit_price": 650,
+          "description": "Mutton Sekuwa"
+        },
+        {
+          "total": 600,
+          "quantity": 3,
+          "unit_price": 200,
+          "description": "Fresh Juice"
+        }
+      ],
+      "total_amount": 3100,
+      "status": "pending",
+      "notes": null,
+      "created_at": "2026-07-10T00:00:00+00:00"
+    },
+    {
+      "id": "6ec556f2-9404-4200-b886-718df3058cb6",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000046",
+      "room_number": "101",
+      "guest_name": "Sarah Lee",
+      "items": [
+        {
+          "total": 550,
+          "quantity": 1,
+          "unit_price": 550,
+          "description": "Chicken Biryani"
+        }
+      ],
+      "total_amount": 550,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-05T00:00:00+00:00"
+    },
+    {
+      "id": "8d1a8f1b-32d1-4c93-a227-608ecce91a16",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000048",
+      "room_number": "303",
+      "guest_name": "Nina Joshi",
+      "items": [
+        {
+          "total": 200,
+          "quantity": 2,
+          "unit_price": 100,
+          "description": "Nepali Tea"
+        },
+        {
+          "total": 300,
+          "quantity": 2,
+          "unit_price": 150,
+          "description": "Gulab Jamun"
+        }
+      ],
+      "total_amount": 500,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-07-04T00:00:00+00:00"
+    },
+    {
+      "id": "78c08b2e-1f97-4f24-a574-4b93d3593e87",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000045",
+      "room_number": null,
+      "guest_name": "Prakash Adhikari",
+      "items": [
+        {
+          "total": 720,
+          "quantity": 4,
+          "unit_price": 180,
+          "description": "French Fries"
+        },
+        {
+          "total": 800,
+          "quantity": 4,
+          "unit_price": 200,
+          "description": "Fresh Juice"
+        }
+      ],
+      "total_amount": 1520,
+      "status": "cancelled",
+      "notes": null,
+      "created_at": "2026-07-07T00:00:00+00:00"
+    },
+    {
+      "id": "7b65669c-12f1-45d3-a920-e4914f7a70c2",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "booking_id": "00000000-0000-0000-0000-000000000061",
+      "room_number": "504",
+      "guest_name": "Emily Clark",
+      "items": [
+        {
+          "total": 2200,
+          "quantity": 4,
+          "unit_price": 550,
+          "description": "Chicken Biryani"
+        },
+        {
+          "total": 1950,
+          "quantity": 3,
+          "unit_price": 650,
+          "description": "Mutton Sekuwa"
+        },
+        {
+          "total": 900,
+          "quantity": 6,
+          "unit_price": 150,
+          "description": "Gulab Jamun"
+        },
+        {
+          "total": 800,
+          "quantity": 4,
+          "unit_price": 200,
+          "description": "Fresh Juice"
+        }
+      ],
+      "total_amount": 5850,
+      "status": "delivered",
+      "notes": null,
+      "created_at": "2026-06-21T00:00:00+00:00"
+    }
+  ],
+  "updatedAt": "2026-07-11T10:56:42.276Z"
+}

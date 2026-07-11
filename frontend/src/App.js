@@ -4,6 +4,7 @@ import MainLayout from './components/layout/MainLayout';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import Landing from './pages/Landing';
+import HotelRegister from './pages/HotelRegister';
 import Dashboard from './pages/Dashboard';
 import Rooms from './pages/Rooms';
 import RoomKanban from './pages/RoomKanban';
@@ -38,6 +39,7 @@ export default function App() {
           {/* Public */}
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<HotelRegister />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
           {/* Protected admin routes wrapped in MainLayout */}
@@ -68,7 +70,7 @@ export default function App() {
             <Route path="/settings" element={<Settings />} />
           </Route>
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </AuthProvider>
   );
 }

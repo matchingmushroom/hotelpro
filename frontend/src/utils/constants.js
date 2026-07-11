@@ -77,6 +77,27 @@ export const ROOM_TYPES = [
   'single', 'double', 'twin', 'suite', 'deluxe', 'penthouse'
 ];
 
+export const AMENITIES = [
+  { value: 'wifi', label: 'WiFi', icon: 'fa-wifi' },
+  { value: 'tv', label: 'TV', icon: 'fa-tv' },
+  { value: 'ac', label: 'AC', icon: 'fa-snowflake' },
+  { value: 'minibar', label: 'Minibar', icon: 'fa-glass-martini-alt' },
+  { value: 'balcony', label: 'Balcony', icon: 'fa-tree' },
+  { value: 'bathtub', label: 'Bathtub', icon: 'fa-bath' },
+  { value: 'living_area', label: 'Living Area', icon: 'fa-couch' },
+  { value: 'kitchenette', label: 'Kitchenette', icon: 'fa-utensils' },
+  { value: 'dining', label: 'Dining', icon: 'fa-chair' },
+  { value: 'heater', label: 'Heater', icon: 'fa-thermometer-half' },
+  { value: 'safe', label: 'Safe', icon: 'fa-shield-alt' },
+  { value: 'hair_dryer', label: 'Hair Dryer', icon: 'fa-wind' },
+  { value: 'workspace', label: 'Workspace', icon: 'fa-desk' },
+  { value: 'pool', label: 'Pool', icon: 'fa-swimmer' },
+  { value: 'garden_view', label: 'Garden View', icon: 'fa-leaf' },
+  { value: 'mountain_view', label: 'Mountain View', icon: 'fa-mountain' },
+  { value: 'city_view', label: 'City View', icon: 'fa-city' },
+  { value: 'breakfast', label: 'Breakfast', icon: 'fa-coffee' },
+];
+
 export const FOOD_CATEGORIES = [
   'veg', 'non_veg', 'beverages', 'desserts', 'snacks'
 ];

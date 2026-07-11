@@ -1,0 +1,30 @@
+[
+  {
+    "timestamp": "2026-07-11T10:30:07.352Z",
+    "tables": [
+      "rooms",
+      "bookings",
+      "guests",
+      "invoices",
+      "payments",
+      "quotes",
+      "food_orders",
+      "cleaning_requests",
+      "profiles"
+    ]
+  },
+  {
+    "timestamp": "2026-07-11T10:56:42.276Z",
+    "tables": [
+      "rooms",
+      "bookings",
+      "guests",
+      "invoices",
+      "payments",
+      "quotes",
+      "food_orders",
+      "cleaning_requests",
+      "profiles"
+    ]
+  }
+]

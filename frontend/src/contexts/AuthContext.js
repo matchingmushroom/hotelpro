@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../config/supabase';
 import { setActivityContext } from '../services/activityService';
+import { registerHotel as apiRegisterHotel } from '../services/backendService';
 
 const AuthContext = createContext(null);
 
@@ -68,10 +69,14 @@ export function AuthProvider({ children }) {
     if (error) throw error;
   };
 
+  const registerHotel = async (hotelData) => {
+    return apiRegisterHotel(hotelData);
+  };
+
   return (
     <AuthContext.Provider value={{
       user, session, profile, loading,
-      signIn, signUp, signOut, resetPassword,
+      signIn, signUp, signOut, resetPassword, registerHotel,
     }}>
       {children}
     </AuthContext.Provider>

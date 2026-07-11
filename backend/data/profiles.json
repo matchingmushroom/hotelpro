@@ -1,0 +1,42 @@
+{
+  "table": "profiles",
+  "rows": [
+    {
+      "id": "5d03f8eb-9b84-4869-9112-606345d2fea6",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "name": "Admin User",
+      "phone": "+977-9800000001",
+      "role": "admin",
+      "is_active": true,
+      "created_at": "2026-07-10T02:30:19.129937+00:00"
+    },
+    {
+      "id": "a7a4e7f8-dc29-4c70-ae82-4192f1488c38",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "name": "Receptionist",
+      "phone": "+977-9800000002",
+      "role": "receptionist",
+      "is_active": true,
+      "created_at": "2026-07-11T03:18:51.152387+00:00"
+    },
+    {
+      "id": "b51335b6-c813-458c-9fbf-3f1d405941cf",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "name": "Housekeeping Staff",
+      "phone": "+977-9800000003",
+      "role": "housekeeping",
+      "is_active": true,
+      "created_at": "2026-07-11T10:19:42.153046+00:00"
+    },
+    {
+      "id": "51b9b360-a084-4df7-b6f4-840d70f89e54",
+      "hotel_id": "00000000-0000-0000-0000-000000000001",
+      "name": "Food Staff",
+      "phone": "+977-9800000004",
+      "role": "food_staff",
+      "is_active": true,
+      "created_at": "2026-07-11T10:19:42.23633+00:00"
+    }
+  ],
+  "updatedAt": "2026-07-11T10:56:42.276Z"
+}

@@ -53,6 +53,7 @@ CREATE TABLE guests (
   address TEXT,
   id_card_front TEXT,
   id_card_back TEXT,
+  loyalty_points INTEGER DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -71,6 +72,7 @@ CREATE TABLE bookings (
   children INTEGER DEFAULT 0,
   special_requests TEXT,
   total_amount DECIMAL(12,2) DEFAULT 0,
+  document_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

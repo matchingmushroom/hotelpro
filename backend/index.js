@@ -6,6 +6,7 @@ const emailRoutes = require('./routes/email');
 const uploadRoutes = require('./routes/upload');
 const backupRoutes = require('./routes/backup');
 const staffRoutes = require('./routes/staff');
+const hotelRoutes = require('./routes/hotel');
 const { startBackupScheduler } = require('./jobs/backupScheduler');
 
 const app = express();
@@ -21,6 +22,7 @@ app.use('/api/email', emailRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/backup', backupRoutes);
 app.use('/api/staff', staffRoutes);
+app.use('/api/hotel', hotelRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

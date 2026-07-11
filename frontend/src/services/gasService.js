@@ -8,11 +8,16 @@ async function callGAS(payload) {
   try {
     const res = await fetch(GAS_URL, {
       method: 'POST',
-      mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    return { success: true };
+    const text = await res.text();
+    try {
+      const json = JSON.parse(text);
+      return json;
+    } catch {
+      return { success: true, raw: text };
+    }
   } catch (err) {
     console.warn('GAS call failed:', err.message);
     return { success: false, error: err.message };
